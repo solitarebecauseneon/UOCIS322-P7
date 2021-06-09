@@ -61,6 +61,7 @@ def json_form(result, top):
 class ListAll(Resource):
     def get(self, dtype='json'):
         top = request.args.get('top', default=-1)
+        app.logger.debug("top: {}".format(top))
         if dtype == 'csv':
             return csv_form(retrieve(), top)
         return json_form(retrieve(), top)
@@ -69,6 +70,7 @@ class ListAll(Resource):
 class ListOpenOnly(Resource):
     def get(self, dtype='json'):
         top = request.args.get('top', default=-1)
+        app.logger.debug("top: {}".format(top))
         if dtype == 'csv':
             return csv_form(retrieve('open'), top)
         return json_form(retrieve('open'), top)
@@ -77,6 +79,7 @@ class ListOpenOnly(Resource):
 class ListCloseOnly(Resource):
     def get(self, dtype='json'):
         top = request.args.get('top', default=-1)
+        app.logger.debug("top: {}".format(top))
         if dtype == 'csv':
             return csv_form(retrieve('closed'), top)
         return json_form(retrieve('closed'), top)
