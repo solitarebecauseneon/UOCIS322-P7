@@ -33,7 +33,7 @@ def retrieve(val_include="default"):
 
 
 def csv_form(result, top):
-    data = ','.join(result[0].keys())
+    data = ','.join(result[0].keys()) + '<br>'
     if top > 0:
         if top > len(result):
             top = len(result)
@@ -51,10 +51,10 @@ def json_form(result, top):
         if top > len(result):
             top = len(result)
         for i in range(top):
-            data = data + str(result[i]) + '\n'
+            data = data + str(result[i]) + '<br>'
     else:
         for i in range(len(result)):
-            data = data + str(result[i]) + '\n'
+            data = data + str(result[i]) + '<br>'
     return data
 
 
