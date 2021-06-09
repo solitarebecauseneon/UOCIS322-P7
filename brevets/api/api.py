@@ -59,8 +59,9 @@ def json_form(result, top):
 
 
 class ListAll(Resource):
-    def get(self, dtype='json'):
-        top = request.args.get('top', default=-1)
+    def get(self, dtype='json', top=-1):
+        app.logger.debug("top: {}".format(top))
+        top = request.args.get('top', default=-1, type=int)
         app.logger.debug("top: {}".format(top))
         if dtype == 'csv':
             return csv_form(retrieve(), top)
@@ -68,8 +69,9 @@ class ListAll(Resource):
 
 
 class ListOpenOnly(Resource):
-    def get(self, dtype='json'):
-        top = request.args.get('top', default=-1)
+    def get(self, dtype='json', top=-1):
+        app.logger.debug("top: {}".format(top))
+        top = request.args.get('top', default=-1, type=int)
         app.logger.debug("top: {}".format(top))
         if dtype == 'csv':
             return csv_form(retrieve('open'), top)
@@ -77,8 +79,9 @@ class ListOpenOnly(Resource):
 
 
 class ListCloseOnly(Resource):
-    def get(self, dtype='json'):
-        top = request.args.get('top', default=-1)
+    def get(self, dtype='json', top=-1):
+        app.logger.debug("top: {}".format(top))
+        top = request.args.get('top', default=-1, type=int)
         app.logger.debug("top: {}".format(top))
         if dtype == 'csv':
             return csv_form(retrieve('closed'), top)
@@ -87,9 +90,9 @@ class ListCloseOnly(Resource):
 
 # Create routes
 # Another way, without decorators
-api.add_resource(ListAll, '/listAll/<string:dtype>', defaults={'dtype': 'json'})
-api.add_resource(ListOpenOnly, '/listOpenOnly/<string:dtype>', defaults={'dtype': 'json'})
-api.add_resource(ListCloseOnly, '/listCloseOnly/<string:dtype>', defaults={'dtype': 'json'})
+api.add_resource(ListAll, ['/listAll/<string:dtype>', '/listAll/'])
+api.add_resource(ListOpenOnly, ['/listOpenOnly/<string:dtype>', '/listOpenOnly/'])
+api.add_resource(ListCloseOnly, ['/listCloseOnly/<string:dtype>', '/listCloseOnly/'])
 
 
 # Run the application
