@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request
 import requests
 import os
 
@@ -23,7 +23,10 @@ def home():
 def listeverything():
     json_csv = request.args.get('json_csv')
     top = request.args.get('top', default=0)
-    r = requests.get(URL_TRACE + '/listAll' + '/' + str(json_csv) + '/' + str(top))
+    if json_csv == "csv":
+        r = requests.get(URL_TRACE + '/listAll' + '/' + str(json_csv))
+    else:
+        r = requests.get(URL_TRACE + '/listAll')
     app.logger.debug("r.text: {}".format(r.text))
     return r.text
 
@@ -32,7 +35,10 @@ def listeverything():
 def listopenonly():
     json_csv = request.args.get('json_csv')
     top = request.args.get('top', default=0)
-    r = requests.get(URL_TRACE + '/listOpenOnly' + '/' + str(json_csv) + '/' + str(top))
+    if json_csv == "csv":
+        r = requests.get(URL_TRACE + '/listOpenOnly' + '/' + str(json_csv))
+    else:
+        r = requests.get(URL_TRACE + '/listOpenOnly')
     app.logger.debug("r.text: {}".format(r.text))
     return r.text
 
@@ -41,7 +47,10 @@ def listopenonly():
 def listcloseonly():
     json_csv = request.args.get('json_csv')
     top = request.args.get('top', default=0)
-    r = requests.get(URL_TRACE + '/listCloseOnly' + '/' + str(json_csv) + '/' + str(top))
+    if json_csv == "csv":
+        r = requests.get(URL_TRACE + '/listCloseOnly' + '/' + str(json_csv))
+    else:
+        r = requests.get(URL_TRACE + '/listCloseOnly')
     app.logger.debug("r.text: {}".format(r.text))
     return r.text
 
