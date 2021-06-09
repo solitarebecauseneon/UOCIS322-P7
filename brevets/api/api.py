@@ -38,10 +38,10 @@ def csv_form(result, top):
         if top > len(result):
             top = len(result)
         for i in range(top):
-            data = data + ','.join(result[i].values()) + '</break>'
+            data = data + ','.join(result[i].values()) + '<br>'
     else:
         for i in range(len(result)):
-            data = data + ','.join(result[i].values()) + '</break>'
+            data = data + ','.join(result[i].values()) + '<br>'
     return data
 
 

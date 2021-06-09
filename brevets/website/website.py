@@ -26,7 +26,7 @@ def listeverything():
     temp_path = URL_TRACE + '/listAll/'
     if json_csv == "csv":
         temp_path = temp_path + 'csv'
-    if top != 0 and top != 1:
+    if top != 0 and top != -1:
         r = requests.get(temp_path, params={'top': top})
     else:
         r = requests.get(temp_path)
@@ -41,7 +41,7 @@ def listopenonly():
     temp_path = URL_TRACE + '/listOpenOnly/'
     if json_csv == "csv":
         temp_path = temp_path + 'csv'
-    if top != 0 and top != 1:
+    if top != 0 and top != -1:
         r = requests.get(temp_path, params={'top': top})
     else:
         r = requests.get(temp_path)
@@ -56,7 +56,7 @@ def listcloseonly():
     temp_path = URL_TRACE + '/listCloseOnly/'
     if json_csv == "csv":
         temp_path = temp_path + 'csv'
-    if top != 0 and top != 1:
+    if top != 0 and top != -1:
         r = requests.get(temp_path, params={'top': top})
     else:
         r = requests.get(temp_path)
