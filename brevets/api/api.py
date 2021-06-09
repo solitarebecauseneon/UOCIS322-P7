@@ -87,11 +87,11 @@ class ListCloseOnly(Resource):
 
 # Create routes
 # Another way, without decorators
-api.add_resource(ListAll, '/listAll/')
+api.add_resource(ListAll, '/listAll')
 api.add_resource(ListAll, '/listAll/<string:dtype>')
-api.add_resource(ListOpenOnly, '/listOpenOnly/')
+api.add_resource(ListOpenOnly, '/listOpenOnly')
 api.add_resource(ListOpenOnly, '/listOpenOnly/<string:dtype>')
-api.add_resource(ListCloseOnly, '/listCloseOnly/')
+api.add_resource(ListCloseOnly, '/listCloseOnly')
 api.add_resource(ListCloseOnly, '/listCloseOnly/<string:dtype>')
 
 
