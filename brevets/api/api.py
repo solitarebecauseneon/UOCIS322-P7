@@ -33,15 +33,15 @@ def retrieve(val_include="default"):
 
 
 def csv_form(result, top):
-    data = ','.join(result[0].keys()) + '\n'
+    data = ','.join(result[0].keys())
     if top > 0:
         if top > len(result):
             top = len(result)
         for i in range(top):
-            data = data + ','.join(result[i].values()) + '\n'
+            data = data + ','.join(result[i].values()) + '</break>'
     else:
         for i in range(len(result)):
-            data = data + ','.join(result[i].values()) + '\n'
+            data = data + ','.join(result[i].values()) + '</break>'
     return data
 
 
@@ -87,8 +87,11 @@ class ListCloseOnly(Resource):
 
 # Create routes
 # Another way, without decorators
+api.add_resource(ListAll, '/listAll/')
 api.add_resource(ListAll, '/listAll/<string:dtype>')
+api.add_resource(ListOpenOnly, '/listOpenOnly/')
 api.add_resource(ListOpenOnly, '/listOpenOnly/<string:dtype>')
+api.add_resource(ListCloseOnly, '/listCloseOnly/')
 api.add_resource(ListCloseOnly, '/listCloseOnly/<string:dtype>')
 
 

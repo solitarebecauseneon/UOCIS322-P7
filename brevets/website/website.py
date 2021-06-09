@@ -25,9 +25,9 @@ def listeverything():
     top = request.args.get('top', default=0)
     temp_path = URL_TRACE + '/listAll/'
     if json_csv == "csv":
-        r = requests.get(temp_path + str(json_csv))
+        r = requests.get(temp_path + str(json_csv), params={'top': top})
     else:
-        r = requests.get(temp_path)
+        r = requests.get(temp_path, params={'top': top})
     app.logger.debug("r.text: {}".format(r.text))
     return r.text
 
@@ -38,9 +38,9 @@ def listopenonly():
     top = request.args.get('top', default=0)
     temp_path = URL_TRACE + '/listOpenOnly/'
     if json_csv == "csv":
-        r = requests.get(temp_path + str(json_csv))
+        r = requests.get(temp_path + str(json_csv), params={'top': top})
     else:
-        r = requests.get(temp_path)
+        r = requests.get(temp_path, params={'top': top})
     app.logger.debug("r.text: {}".format(r.text))
     return r.text
 
@@ -51,9 +51,9 @@ def listcloseonly():
     top = request.args.get('top', default=0)
     temp_path = URL_TRACE + '/listCloseOnly/'
     if json_csv == "csv":
-        r = requests.get(temp_path + str(json_csv))
+        r = requests.get(temp_path + str(json_csv), params={'top': top})
     else:
-        r = requests.get(temp_path)
+        r = requests.get(temp_path, params={'top': top})
     app.logger.debug("r.text: {}".format(r.text))
     return r.text
 
