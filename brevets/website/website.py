@@ -204,13 +204,14 @@ def logout():
 @app.route('/listevery')
 @login_required
 def listeverything():
+    s = current_user.db_dict()['token']
     json_csv = request.args.get('json_csv')
     top = request.args.get('top', default=0, type=int)
     temp_path = URL_TRACE + '/listAll/'
     if json_csv == "csv":
         temp_path = temp_path + 'csv'
     if top != 0 and top != -1:
-        r = requests.get(temp_path, params={'top': top})
+        r = requests.get(temp_path, params={'top': top, 'token': s})
     else:
         r = requests.get(temp_path)
         app.logger.debug("r.text: {}".format(r.status_code))
@@ -224,13 +225,14 @@ def listeverything():
 @app.route('/listopen')
 @login_required
 def listopenonly():
+    s = current_user.db_dict()['token']
     json_csv = request.args.get('json_csv')
     top = request.args.get('top', default=0, type=int)
     temp_path = URL_TRACE + '/listOpenOnly/'
     if json_csv == "csv":
         temp_path = temp_path + 'csv'
     if top != 0 and top != -1:
-        r = requests.get(temp_path, params={'top': top})
+        r = requests.get(temp_path, params={'top': top, 'token': s})
     else:
         r = requests.get(temp_path)
     if r.status_code == 401:
@@ -243,13 +245,14 @@ def listopenonly():
 @app.route('/listclose')
 @login_required
 def listcloseonly():
+    s = current_user.db_dict()['token']
     json_csv = request.args.get('json_csv')
     top = request.args.get('top', default=0, type=int)
     temp_path = URL_TRACE + '/listCloseOnly/'
     if json_csv == "csv":
         temp_path = temp_path + 'csv'
     if top != 0 and top != -1:
-        r = requests.get(temp_path, params={'top': top})
+        r = requests.get(temp_path, params={'top': top, 'token': s})
     else:
         r = requests.get(temp_path)
     if r.status_code == 401:
