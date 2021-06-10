@@ -7,10 +7,9 @@ from flask_restful import Resource, Api
 from pymongo import MongoClient
 
 
-
 # API set-up
 app = Flask(__name__)
-SECRET_KEY = b"\xc0\x923\x909\x8b\x19H4'K9*\xaay\xdc\xaf\xb5\xbdf_>z \x13$H\x04\x8d\xee*\xbb"
+SECRET_KEY = b"\xc0\x923\x909\x8b\x19H4'K9*\xaay\xdc\xaf\xb5\xbdf_>z\x13$H\x04\x8d\xee*\xbb"
 app.secret_key = SECRET_KEY
 api = Api(app)
 
@@ -174,7 +173,7 @@ class TokenGeneration(Resource):
             if user_info['username'] == str(username) and user_info['password'] == str(password):
                 expiration = 600
                 s = generate_auth_token(SECRET_KEY, expiration)
-                result = s.dumps({'username': username}).decode('utf-8')
+                result = s.dumps({'username': username}).decode('utf-16')
                 app.logger.debug("Fun stuff! {}".format(result))
                 return jsonify(result)
         return "", 401
@@ -182,7 +181,8 @@ class TokenGeneration(Resource):
 
 class ListAll(Resource):
     def get(self, dtype='json'):
-        token = request.args.get('token', default='nope').encode('utf-8')
+        token = request.args.get('token', default='nope').encode('utf-16')
+        app.logger.debug(token)
         if not verify_auth_token(SECRET_KEY, token):
             return 401
         top = request.args.get('top', default=-1, type=int)
@@ -194,7 +194,8 @@ class ListAll(Resource):
 
 class ListOpenOnly(Resource):
     def get(self, dtype='json'):
-        token = request.args.get('token', default='nope').encode('utf-8')
+        token = request.args.get('token', default='nope').encode('utf-16')
+        app.logger.debug(token)
         if not verify_auth_token(SECRET_KEY, token):
             return 401
         top = request.args.get('top', default=-1, type=int)
@@ -206,7 +207,8 @@ class ListOpenOnly(Resource):
 
 class ListCloseOnly(Resource):
     def get(self, dtype='json'):
-        token = request.args.get('token', default='nope').encode('utf-8')
+        token = request.args.get('token', default='nope').encode('utf-16')
+        app.logger.debug(token)
         if not verify_auth_token(SECRET_KEY, token):
             return 401
         top = request.args.get('top', default=-1, type=int)
