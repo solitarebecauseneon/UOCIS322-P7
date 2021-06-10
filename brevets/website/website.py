@@ -118,7 +118,10 @@ def index():
 @app.route('/calc_index.html')
 @login_required
 def home():
-    return render_template('calc_index.html')
+    if current_user.db_dict()['token'] == 'none':
+        return redirect(url_for('get_token'))
+    else:
+        return render_template('calc_index.html')
 
 
 @app.route('/get_token')
