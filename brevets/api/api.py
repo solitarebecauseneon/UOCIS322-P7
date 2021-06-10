@@ -27,7 +27,7 @@ def retrieve_user(uid=-2, username=""):
     return user_db.timestable.find_one({'_id': int(uid)})
 
 
-@app.route('/user_check')
+@app.route('/_user_check')
 def user_check():
     """
     returns a JSON object, {uid:int, username:str, password:str}
@@ -110,7 +110,7 @@ def json_form(result, top):
     return data
 
 
-@app.route('/pass_check')
+@app.route('/_pass_check')
 def pull_password():
     """
     Retrieves hashed password for specified username
