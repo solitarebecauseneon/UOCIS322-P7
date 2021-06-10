@@ -175,7 +175,7 @@ def new_user():
         r_text = json.loads(r.text)
         app.logger.debug("register/username_check: {}".format(r_text))
         app.logger.debug("register/username_check: {}".format(r_text['uid']))
-        if r_text['uid'] != -1:  # username already exists!
+        if r_text['uid'] == -1:  # username already exists!
             flash("Username taken! Try again.")
             return render_template('register.html', form=form)
         else:  # if username does not already exist
