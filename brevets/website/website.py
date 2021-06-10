@@ -170,10 +170,10 @@ def login():
             if login_user(temp_user, remember=remember):
                 flash("Logged in!")
                 flash("I'll remember you") if remember else None
-                next = url_for('index', next_url=url_for('get_token'))
+                next = url_for('get_token')
                 if not is_safe_url(next):
                     abort(400)
-                return redirect(next)
+                return redirect(next or url_for('index'))
     return render_template('login.html', form=form)
 
 
