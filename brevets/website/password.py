@@ -3,7 +3,7 @@ from passlib.hash import sha256_crypt as pwd_context
 
 def hash_password(password):
     """returns hashed password for user_db storage"""
-    pwd_context.using(salt="some string").encrypt(password)
+    pwd_context.using(salt="wnsT7Yr92oJoP28r").encrypt(password)
 
 
 def verify_password(password, hashVal):
