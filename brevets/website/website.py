@@ -35,7 +35,8 @@ URL_TRACE = "http://" + os.environ['BACKEND_ADDR'] + ":" + os.environ['BACKEND_P
 def load_user(uid):
     r = requests.get(URL_TRACE + '/user_check', params={'uid': uid})
     r_text = json.loads(r.text)
-    return r_text['uid']
+    temp = User(r_text['uid'], r_text['username'], r_text['password'])
+    return temp
 
 
 login_manager.init_app(app)
@@ -79,7 +80,7 @@ def is_safe_url(target):
 
 class User(UserMixin):
     def __init__(self, uid, username, password):
-        self.id = uid
+        self.id = str(uid).encode("utf-8").decode("utf-8")
         self.username = username
         self.password = password
         self.token = 'nope'
@@ -120,11 +121,12 @@ def home():
 
 @app.route('/get_token')
 def get_token():
-    r = requests.get(URL_TRACE + '/token', params=current_user.db_dict())
-    if r.status_code == 401:
-        abort(401)
-    r_text = json.loads(r.text)
-    current_user.set_token(r_text['token'])
+    if current_user.is_authenticated:
+        r = requests.get(URL_TRACE + '/token')
+        if r.status_code == 401:
+            abort(401)
+        r_text = json.loads(r.text)
+        current_user.set_token(r_text['token'])
     return redirect(url_for('index'))
 
 

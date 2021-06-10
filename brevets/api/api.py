@@ -141,7 +141,7 @@ def register():
         if temp_user['username'] != username:
             return 400
     user = {
-        '_id': user_db.timestable.estimated_document_count() + 1,
+        '_id': str(user_db.timestable.estimated_document_count() + 1).encode("utf-8").decode("utf-8"),
         'username': username,
         'password': password
     }
