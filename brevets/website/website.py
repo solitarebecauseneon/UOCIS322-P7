@@ -155,7 +155,7 @@ def login():
         r = requests.get(URL_TRACE + '/user_check', params=temp_user.db_dict())
         r_text = json.loads(r.text)
         temp_user.set_id(r_text['uid'])
-        uid = temp_user.db_dict['uid']
+        uid = temp_user.db_dict()['uid']
         # Login user, if nothing went wrong finding user info in database
         if proceed:
             if login_user(temp_user, remember=remember):
