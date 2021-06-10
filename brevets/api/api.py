@@ -49,6 +49,7 @@ class UserCheck(Resource):
         else:
             app.logger.debug("usercheck/uid: {}".format(uid))
             user_entry = retrieve_user(uid)  # uid given: retrieve entry using uid
+        app.logger.debug("registerUser/output: {}".format(user_entry))
         if user_entry:  # if an entry is found
             result = {
                 'uid': user_entry['_id'],
@@ -135,7 +136,6 @@ def register():
     Inputs username and hashword into database, if it does not already
     exist. Returns
     """
-    app.logger.debug("registerUser/output: {}".format(1))
     username = request.args.get('username')
     password = request.args.get('password')
     temp_user = retrieve_user(username=username)
