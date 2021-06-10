@@ -118,10 +118,7 @@ def index():
 @app.route('/calc_index.html')
 @login_required
 def home():
-    if current_user.db_dict()['token'] == 'none':
-        return redirect(url_for('get_token'))
-    else:
-        return render_template('calc_index.html')
+    return render_template('calc_index.html')
 
 
 @app.route('/get_token')
@@ -162,7 +159,7 @@ def login():
             if login_user(temp_user, remember=remember):
                 flash("Logged in!")
                 flash("I'll remember you") if remember else None
-                next = request.args.get("next")
+                next = url_for('get_token')
                 if not is_safe_url(next):
                     abort(400)
                 return redirect(next or url_for('index'))

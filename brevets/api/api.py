@@ -160,7 +160,7 @@ def register():
 
 class TokenGeneration(Resource):
     """
-    Checks if username and hashword (hashed password) exists in
+    Checks if username and password (hashed password) exists in
     database. If so, generates and returns a token. Else, returns abort request
     """
     def get(self):
