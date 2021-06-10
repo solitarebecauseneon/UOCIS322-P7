@@ -130,15 +130,13 @@ def login():
         remember = request.form.get("remember", "false") == "true"
 
         # Check if user exists in database and if password is correct
-        s = temp_user.db_dict()
-        r = requests.get(URL_TRACE + '/user_check', params={'username': s['username'], 'uid': s['uid']})
+        r = requests.get(URL_TRACE + '/user_check', params=temp_user.db_dict())
         r_text = json.loads(r.text)
         if r_text['uid'] == -1:  # no matching username found in database
             flash("Username does not exist!")
             proceed = False
-        temp_user.set_id(r_text['_id'])
-        s = temp_user.db_dict()
-        r = requests.get(URL_TRACE + '/pass_check', params={'username': s['username']})
+        temp_user.set_id(r_text['uid'])
+        r = requests.get(URL_TRACE + '/pass_check', params=temp_user.db_dict())
         r_text = json.loads(r.text)
         app.logger.debug("login/passcheck: {}".format(r_text['password']))
         app.logger.debug("login/password: {}".format(password))
@@ -150,8 +148,7 @@ def login():
             if login_user(temp_user, remember=remember):
                 flash("Logged in!")
                 flash("I'll remember you") if remember else None
-                s = temp_user.db_dict()
-                r = requests.get(URL_TRACE + '/token', params={'username': s['username'], 'password': s['password']})
+                r = requests.get(URL_TRACE + '/token', params=temp_user.db_dict())
                 if r.status_code == 401:
                     return render_template('login_html', form=form)
                 r_text = json.loads(r.text)
@@ -174,12 +171,11 @@ def new_user():
         app.logger.debug("register/password: {}".format(password))
         temp_user = User(-1, username, password)
         # check if username already exists
-        s = temp_user.db_dict()
-        r = requests.get(URL_TRACE + '/user_check', params={'username': s['username'], 'uid': s['uid']})
+        r = requests.get(URL_TRACE + '/user_check', params=temp_user.db_dict())
         r_text = json.loads(r.text)
         app.logger.debug("register/username_check: {}".format(r_text))
         app.logger.debug("register/username_check: {}".format(r_text['uid']))
-        if r_text['uid'] == -1:  # username already exists!
+        if r_text['uid'] != -1:  # username already exists!
             flash("Username taken! Try again.")
             return render_template('register.html', form=form)
         else:  # if username does not already exist
