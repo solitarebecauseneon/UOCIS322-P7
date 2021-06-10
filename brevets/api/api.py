@@ -43,7 +43,7 @@ class UserCheck(Resource):
         uid = request.args.get('uid', default=-1)
         username = request.args.get('username', default='-1')
         # checking for user in user_db
-        if uid == -1:  # if no uid given
+        if int(uid) == -1:  # if no uid given
             app.logger.debug("usercheck/username: {}".format(username))
             user_entry = retrieve_user(username=username)  # retrieve entry using username
         else:
@@ -143,7 +143,7 @@ def register():
         if temp_user['username'] != username:
             return 400
     user = {
-        '_id': user_db.timestable.count() + 1,
+        '_id': user_db.timestable.estimated_document_count() + 1,
         'username': username,
         'password': password
     }
