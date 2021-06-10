@@ -11,8 +11,8 @@ import time
 
 # API set-up
 app = Flask(__name__)
-SECRET_KEY = os.urandom(32)
-app.config['SECRET_KEY'] = SECRET_KEY
+SECRET_KEY = b"\xc0\x923\x909\x8b\x19H4'K9*\xaay\xdc\xaf\xb5\xbdf_>z \x13$H\x04\x8d\xee*\xbb"
+app.secret_key = SECRET_KEY
 api = Api(app)
 
 # Database set-up

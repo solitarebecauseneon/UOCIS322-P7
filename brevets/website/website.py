@@ -12,6 +12,8 @@ import json
 
 app = Flask(__name__)
 
+app.secret_key = os.urandom(32)
+
 # LoginManager set-up
 login_manager = LoginManager()
 
