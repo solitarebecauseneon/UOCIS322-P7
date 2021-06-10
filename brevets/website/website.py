@@ -164,6 +164,8 @@ def new_user():
     if form.validate_on_submit() and request.method == "POST" and ("username" and "password" in request.form):
         username = form.username.data
         password = hash_password(form.password.data)
+        app.logger.debug("register/username: {}".format(username))
+        app.logger.debug("register/password: {}".format(password))
         temp_user = User(-1, username, password)
         # check if username already exists
         r = requests.get(URL_TRACE + '/user_check', params=temp_user.db_dict())
@@ -177,6 +179,7 @@ def new_user():
             r = requests.get(URL_TRACE + '/register', params=temp_user.db_dict())
             if r.status_code == 401:
                 return render_template('register.html', form=form)
+            r_text = json.loads(r.text)
             app.logger.debug("register/reg_success: {}".format(r_text))
             temp_user.set_id(r_text['uid'])
             return redirect(url_for('login'))
