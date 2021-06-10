@@ -183,8 +183,9 @@ class TokenGeneration(Resource):
 class ListAll(Resource):
     def get(self, dtype='json'):
         token = request.args.get('token', default='nope')
+        token = token.replace('"', "")
         leng = len(token)
-        if not verify_auth_token(SECRET_KEY, token[1:leng-1]):
+        if not verify_auth_token(SECRET_KEY, bin(token)):
             return 401
         top = request.args.get('top', default=-1, type=int)
         app.logger.debug("top: {}".format(top))
@@ -196,8 +197,9 @@ class ListAll(Resource):
 class ListOpenOnly(Resource):
     def get(self, dtype='json'):
         token = request.args.get('token', default='nope')
+        token = token.replace('"', "")
         leng = len(token)
-        if not verify_auth_token(SECRET_KEY, token[1:leng-1]):
+        if not verify_auth_token(SECRET_KEY, bin(token)):
             return 401
         top = request.args.get('top', default=-1, type=int)
         app.logger.debug("top: {}".format(top))
@@ -209,8 +211,9 @@ class ListOpenOnly(Resource):
 class ListCloseOnly(Resource):
     def get(self, dtype='json'):
         token = request.args.get('token', default='nope')
+        token = token.replace('"', "")
         leng = len(token)
-        if not verify_auth_token(SECRET_KEY, token[1:leng-1]):
+        if not verify_auth_token(SECRET_KEY, bin(token)):
             return 401
         top = request.args.get('top', default=-1, type=int)
         app.logger.debug("top: {}".format(top))
