@@ -43,12 +43,13 @@ class UserCheck(Resource):
         uid = request.args.get('uid', default=-1)
         username = request.args.get('username', default='-1')
         # checking for user in user_db
-        if uid == -1:  # if no uid given
+        if int(uid) == -1:  # if no uid given
             app.logger.debug("usercheck/username: {}".format(username))
             user_entry = retrieve_user(username=username)  # retrieve entry using username
         else:
             app.logger.debug("usercheck/uid: {}".format(uid))
             user_entry = retrieve_user(uid)  # uid given: retrieve entry using uid
+        app.logger.debug("registerUser/output: {}".format(user_entry))
         if user_entry:  # if an entry is found
             result = {
                 'uid': user_entry['_id'],
@@ -115,12 +116,18 @@ class PullPassword(Resource):
     """
     def get(self):
         username = request.args.get('username')
-        user = retrieve_user(username)
+        user = retrieve_user(username=username)
         if user:
             result = {'password': user['password']}
         else:
             return 400
         return jsonify(result)
+
+
+@app.route('/hidden')
+def delete():
+    user_db.timestable.delete_many({})
+    return 200
 
 
 @app.route('/register', methods=["POST"])
@@ -129,7 +136,6 @@ def register():
     Inputs username and hashword into database, if it does not already
     exist. Returns
     """
-    app.logger.debug("registerUser/output: {}".format(1))
     username = request.args.get('username')
     password = request.args.get('password')
     temp_user = retrieve_user(username=username)
@@ -137,7 +143,7 @@ def register():
         if temp_user['username'] != username:
             return 400
     user = {
-        '_id': user_db.timestable.count() + 1,
+        '_id': user_db.timestable.estimated_document_count() + 1,
         'username': username,
         'password': password
     }
