@@ -33,7 +33,7 @@ URL_TRACE = "http://" + os.environ['BACKEND_ADDR'] + ":" + os.environ['BACKEND_P
 
 @login_manager.user_loader
 def load_user(uid):
-    r = requests.get(URL_TRACE + '/user_check', params={'uid': uid})
+    r = requests.get(URL_TRACE + '/user_check', params={'uid': int(uid)})
     app.logger.debug(r.text)
     r_text = json.loads(r.text)
     app.logger.debug(r_text)
@@ -146,9 +146,9 @@ def login():
         remember = request.form.get("remember", "false") == "true"
 
         # Check if user exists in database and if password is correct
-        r = requests.get(URL_TRACE + '/user_check', params=temp_user.db_dict())
+        r = requests.get(URL_TRACE + '/pass_check', params=temp_user.db_dict())
         r_text = json.loads(r.text)
-        if r_text['uid'] == -1:  # no matching username found in database
+        if r_text['login'] == 'fail':  # no matching username found in database
             flash("Invalid username or password!")
             proceed = False
         temp_user.set_id(r_text['uid'])
@@ -157,6 +157,9 @@ def login():
             if login_user(temp_user, remember=remember):
                 flash("Logged in!")
                 flash("I'll remember you") if remember else None
+                next = request.args.get("next")
+                if not is_safe_url(next):
+                    abort(400)
                 return redirect(next or url_for('index'))
     return render_template('login.html', form=form)
 
@@ -182,7 +185,6 @@ def new_user():
             app.logger.debug("register/reg_success: {}".format(r.text))
             r_text = json.loads(r.text)
             app.logger.debug("register/reg_success: {}".format(r_text))
-            temp_user.set_id(r_text['_id'])
             return redirect(url_for('login'))
 
     return render_template('register.html', form=form)

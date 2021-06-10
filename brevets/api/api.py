@@ -35,35 +35,28 @@ class UserCheck(Resource):
     no entry matching uid or username was found in user_db
     username: returns 'username' element from user_db; if
     blank on exit, no entry found
-    password: returns value only if needed for User object
-
     """
     def get(self):
         # variables
         uid = request.args.get('uid', default=-1)
-        username = request.args.get('username', default='-1')
-        password = request.args.get('password', default='-1')
-        # checking for user in user_db
+        username = str(request.args.get('username', default='-1'))
+
+        # checking for user in user_db using username
         if int(uid) == -1:  # if no uid given
             app.logger.debug("usercheck/username: {}".format(username))
             user_entry = retrieve_user(username=username)  # retrieve entry using username
         else:
             app.logger.debug("usercheck/uid: {}".format(uid))
-            user_entry = retrieve_user(uid)  # uid given: retrieve entry using uid
-        app.logger.debug("registerUser/output: {}".format(user_entry))
-        if user_entry:  # if an entry is found
+            user_entry = retrieve_user(int(uid))  # uid given: retrieve entry using uid
+        app.logger.debug("userCheck/user_entry: {}".format(user_entry))
+        # if found through exact match of names
+        if user_entry and ((int(uid) > 0) or (str(user_entry['username']) == str(username))):
             result = {
                 'uid': user_entry['_id'],
                 'username': user_entry['username'],
                 'password': user_entry['password']
             }
-            if int(uid) == -1 and result['username'] == str(username):
-                result = {
-                    'uid': -1,
-                    'username': '',
-                    'password': ''
-                }
-                return jsonify(result)
+            return jsonify(result)
         else:  # no entry found; return uid as -1, other values as blanks
             result = {
                 'uid': -1,
@@ -71,17 +64,24 @@ class UserCheck(Resource):
                 'password': ''
             }
             return jsonify(result)
-        if str(password) == '-1':
-            return jsonify(result)
-        if result['password'] == str(password):
-            return jsonify(result)
+
+
+class UserPassCheck(Resource):
+    """Checks username and password against database"""
+    def get(self):
+        username = str(request.args.get('username'))
+        password = str(request.args.get('password'))
+        user_entry = retrieve_user(username=username)
+        if user_entry:
+            db_user = str(user_entry['username'])
+            db_pass = str(user_entry['password'])
+            if db_pass == password and db_user == username:
+                result = {'login': 'success'}
+            else:
+                result = {'login': 'fail'}
         else:
-            result = {
-                'uid': -1,
-                'username': '',
-                'password': ''
-            }
-            return jsonify(result)
+            result = {'login': 'fail'}
+        return result
 
 
 def retrieve(val_include="default"):
@@ -141,8 +141,8 @@ def register():
     Inputs username and hashword into database, if it does not already
     exist. Returns
     """
-    username = request.args.get('username')
-    password = request.args.get('password')
+    username = str(request.args.get('username'))
+    password = str(request.args.get('password'))
     temp_user = retrieve_user(username=username)
     if temp_user:
         if temp_user['username'] != username:
@@ -216,6 +216,7 @@ class ListCloseOnly(Resource):
 # Create routes
 # Another way, without decorators
 api.add_resource(UserCheck, '/user_check')
+api.add_resource(UserPassCheck, '/pass_check')
 api.add_resource(TokenGeneration, '/token')
 api.add_resource(ListAll, '/listAll/<string:dtype>', '/listAll/')
 api.add_resource(ListOpenOnly, '/listOpenOnly/<string:dtype>', '/listOpenOnly/')
