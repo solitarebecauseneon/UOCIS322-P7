@@ -129,8 +129,7 @@ def get_token():
         app.logger.debug("/get_token/token: {}".format(r.text))
         if r.status_code == 401:
             abort(401)
-        r_text = json.loads(r.text)
-        current_user.set_token(r_text['token'])
+        current_user.set_token(r.text)
     return redirect(url_for('index'))
 
 
