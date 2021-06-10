@@ -137,13 +137,12 @@ def register():
         if temp_user['username'] != username:
             return 400
     user = {
+        '_id': user_db.timestable.count() + 1,
         'username': username,
         'password': password
     }
     user_db.timestable.insert_one(user)
-    temp = user_db.timestable.find_one({'username': user['username']})
-    user['uid'] = temp['_id']
-    app.logger.debug("registerUser/user: {}".format(user['uid']))
+    app.logger.debug("registerUser/user: {}".format(user['_id']))
     app.logger.debug("registerUser/user: {}".format(user))
     return jsonify(user), 201
 
