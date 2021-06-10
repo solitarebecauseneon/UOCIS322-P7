@@ -5,7 +5,7 @@ from itsdangerous import (TimedJSONWebSignatureSerializer
 
 def generate_auth_token(key, expiration=600):
     s = Serializer(key, expires_in=expiration)
-    return s
+    return s.dumps({'party': 'started'})
 
 
 def verify_auth_token(key, token):

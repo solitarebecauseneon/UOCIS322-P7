@@ -1,14 +1,14 @@
 from itsdangerous import (TimedJSONWebSignatureSerializer \
-                                  as Serializer, BadSignature, \
-                                  SignatureExpired)
+                              as Serializer, BadSignature, \
+                          SignatureExpired)
 import time
 
 SECRET_KEY = 'test1234@#$'
 
 
 def generate_auth_token(expiration=600):
-   s = Serializer(SECRET_KEY, expires_in=expiration)
-   return s.dumps({'id': 5, 'name': 'Ryan'})
+    s = Serializer(SECRET_KEY, expires_in=expiration)
+    return s.dumps({'id': 5, 'name': 'Ryan'})
 
 
 def verify_auth_token(token):
@@ -16,9 +16,9 @@ def verify_auth_token(token):
     try:
         data = s.loads(token)
     except SignatureExpired:
-        return "Expired token!"    # valid token, but expired
+        return "Expired token!"  # valid token, but expired
     except BadSignature:
-        return "Invalid token!"    # invalid token
+        return "Invalid token!"  # invalid token
     return f"Success! Welcome {data['username']}."
 
 
