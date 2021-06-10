@@ -135,6 +135,12 @@ def delete():
     return 200
 
 
+@app.route('/list_all_users')
+def create_dict():
+    all_users = retrieve_user(uid=-2)
+    return jsonify(all_users)
+
+
 @app.route('/register', methods=["POST"])
 def register():
     """

@@ -106,6 +106,15 @@ def page_not_found(error):
     return render_template('404.html'), 404
 
 
+@app.route('/fill_users')
+def fill_up():
+    r = requests.get(URL_TRACE + '/list_all_users')
+    r_text = json.loads(r.text)
+    for i in r_text.keys():
+        USERS[str(i)] = r_text[i]
+    return render_template(url_for('index'))
+
+
 @app.route('/')
 @app.route('/index')
 def index():
@@ -155,11 +164,9 @@ def login():
         r = requests.get(URL_TRACE + '/user_check', params=temp_user.db_dict())
         r_text = json.loads(r.text)
         temp_user.set_id(r_text['uid'])
-        uid = temp_user.db_dict()['uid']
         # Login user, if nothing went wrong finding user info in database
         if proceed:
             if login_user(temp_user, remember=remember):
-                USERS[str(uid)] = temp_user
                 flash("Logged in!")
                 flash("I'll remember you") if remember else None
                 next = url_for('get_token')
