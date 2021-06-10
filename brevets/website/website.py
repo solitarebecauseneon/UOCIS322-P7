@@ -189,9 +189,6 @@ def new_user():
             r = requests.post(URL_TRACE + '/register', params=temp_user.db_dict())
             if r.status_code == 400:
                 return render_template('register.html', form=form)
-            app.logger.debug("register/reg_success: {}".format(r.text))
-            r_text = json.loads(r.text)
-            app.logger.debug("register/reg_success: {}".format(r_text))
             return redirect(url_for('login'))
 
     return render_template('register.html', form=form)
