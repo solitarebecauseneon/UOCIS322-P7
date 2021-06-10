@@ -62,7 +62,7 @@ class UserCheck(Resource):
                 'username': '',
                 'password': ''
             }
-        return jsonify(result)
+        return jsonify(result), 200
 
 
 def retrieve(val_include="default"):
@@ -121,7 +121,7 @@ class PullPassword(Resource):
             result = {'password': user['password']}
         else:
             return "", 400
-        return jsonify(result)
+        return jsonify(result), 200
 
 
 @app.route('/hidden')
