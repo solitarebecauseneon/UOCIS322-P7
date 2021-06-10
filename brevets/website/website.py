@@ -114,20 +114,20 @@ def page_not_found(error):
 @app.route('/')
 @app.route('/index')
 def index():
-    if current_user.is_authenticated and current_user.db_dict()['token'] == 'none':
-        return redirect(url_for('get_token'))
     return render_template('index.html')
 
 
 @app.route('/calc_index.html')
 @login_required
 def home():
+    if current_user.is_authenticated and current_user.db_dict()['token'] == 'nope':
+        return redirect(url_for('get_token'))
     return render_template('calc_index.html')
 
 
 @app.route('/get_token')
 def get_token():
-    if current_user.is_authenticated:
+    if current_user.is_authenticated and current_user.db_dict()['token'] == 'nope':
         s = current_user.db_dict()
         uid = s['uid']
         r = requests.get(URL_TRACE + '/token', params=s)
@@ -139,6 +139,7 @@ def get_token():
             USERS[str(uid)] = current_user
         else:
             USERS[str(uid)] = current_user
+        app.logger.debug("current_user: {}".format(current_user))
     return redirect(url_for('index'))
 
 
