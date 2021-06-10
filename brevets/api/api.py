@@ -38,7 +38,7 @@ class UserCheck(Resource):
     """
     def get(self):
         # variables
-        uid = request.args.get('uid', default=-1)
+        uid = int(request.args.get('uid', default=-1))
         username = str(request.args.get('username', default='-1'))
 
         # checking for user in user_db using username
@@ -148,7 +148,7 @@ def register():
         if temp_user['username'] != username:
             return 400
     user = {
-        '_id': str(user_db.timestable.estimated_document_count() + 1).encode("utf-8").decode("utf-8"),
+        '_id': int(str(user_db.timestable.estimated_document_count() + 1).encode("utf-8").decode("utf-8")),
         'username': username,
         'password': password
     }
