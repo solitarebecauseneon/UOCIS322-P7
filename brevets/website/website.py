@@ -35,10 +35,7 @@ USERS = {}
 
 @login_manager.user_loader
 def load_user(uid):
-    if str(uid) in USERS.keys():
-        USERS[str(uid)] = current_user
-        return USERS[str(uid)]
-    else:
+    if str(uid) not in USERS.keys():
         USERS[str(uid)] = current_user
     return USERS[str(uid)]
 
