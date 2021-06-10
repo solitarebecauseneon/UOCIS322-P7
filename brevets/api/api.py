@@ -35,17 +35,13 @@ class UserCheck(Resource):
     no entry matching uid or username was found in user_db
     username: returns 'username' element from user_db; if
     blank on exit, no entry found
-    password: returns '0' if password matches one found in user_db;
-    returns 'password' element from user_db if User class being created;
-    returns '-1' if password does not match user_db's 'password' element
+    password: returns value only if needed for User object
 
     """
     def get(self):
         # variables
         uid = request.args.get('uid', default=-1)
         username = request.args.get('username', default='-1')
-        password = request.args.get('password', default='-1')
-
         # checking for user in user_db
         if uid == -1:  # if no uid given
             app.logger.debug("usercheck/username: {}".format(username))
@@ -54,24 +50,11 @@ class UserCheck(Resource):
             app.logger.debug("usercheck/uid: {}".format(uid))
             user_entry = retrieve_user(uid)  # uid given: retrieve entry using uid
         if user_entry:  # if an entry is found
-            if password == '-1':  # if password is default, return all for User class creation
-                result = {
-                    'uid': user_entry['_id'],
-                    'username': user_entry['username'],
-                    'password': user_entry['password']
-                }
-            elif user_entry['password'] == password:  # password is not default; check if password match db password
-                result = {
-                    'uid': user_entry['_id'],
-                    'username': user_entry['username'],
-                    'password': '0'
-                }
-            else:  # password does NOT match database entry
-                result = {
-                    'uid': user_entry['_id'],
-                    'username': user_entry['username'],
-                    'password': '-1'
-                }
+            result = {
+                'uid': user_entry['_id'],
+                'username': user_entry['username'],
+                'password': user_entry['password']
+            }
         else:  # no entry found; return uid as -1, other values as blanks
             result = {
                 'uid': -1,
@@ -124,6 +107,20 @@ def json_form(result, top):
         for i in range(len(result)):
             data = data + str(result[i]) + '<br>'
     return data
+
+
+class PullPassword(Resource):
+    """
+    Retrieves hashed password for specified username
+    """
+    def get(self):
+        username = request.args.get('username')
+        user = retrieve_user(username)
+        if user:
+            result = {'password': user['password']}
+        else:
+            return 400
+        return result
 
 
 class RegisterUser(Resource):

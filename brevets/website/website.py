@@ -34,8 +34,8 @@ URL_TRACE = "http://" + os.environ['BACKEND_ADDR'] + ":" + os.environ['BACKEND_P
 @login_manager.user_loader
 def load_user(uid):
     r = requests.get(URL_TRACE + '/user_check', params={'uid': uid})
-    r = r.text
-    return r[0]
+    r_text = json.loads(r.text)
+    return r_text['uid']
 
 
 login_manager.init_app(app)
@@ -61,11 +61,11 @@ class RegisterForm(Form):
     password = PasswordField('Password', [
         validators.Length(min=6, max=20,
                           message=u"Password must be between 6 and 20 characters"),
-        validators.InputRequired(u"Must put in a password!")])
+        validators.InputRequired(u"Must put in a password!"),
+        validators.EqualTo('confirm', message='Passwords did not match')])
     confirm = PasswordField('Confirm password', [
         validators.Length(min=6, max=20,
-                          message=u"Password must be between 6 and 20 characters"),
-        validators.EqualTo('confirm', message='Passwords must match')])
+                          message=u"Password must be between 6 and 20 characters")])
 
 
 def is_safe_url(target):
