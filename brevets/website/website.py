@@ -126,7 +126,7 @@ def login():
         username = form.username.data
         password = hash_password(form.password.data)
         temp_user = User(-1, username, password)
-        remember = request.form.get("remember", "false") == "true"
+        remember = form.remember.data("remember", "false") == "true"
 
         # Check if user exists in database and if password is correct
         r = requests.get(URL_TRACE + '/user_check', params=temp_user.db_dict())
