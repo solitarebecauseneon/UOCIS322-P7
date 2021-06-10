@@ -27,8 +27,7 @@ def retrieve_user(uid=-2, username=""):
     return user_db.timestable.find_one({'_id': int(uid)})
 
 
-@app.route('/_user_check')
-def user_check():
+class UserCheck(Resource):
     """
     returns a JSON object, {uid:int, username:str, password:str}
 
@@ -39,30 +38,30 @@ def user_check():
     password: returns value only if needed for User object
 
     """
-    # variables
-    uid = request.args.get('uid', default=-1)
-    username = request.args.get('username', default='-1')
-    # checking for user in user_db
-    if int(uid) == -1:  # if no uid given
-        app.logger.debug("usercheck/username: {}".format(username))
-        user_entry = retrieve_user(username=username)  # retrieve entry using username
-    else:
-        app.logger.debug("usercheck/uid: {}".format(uid))
-        user_entry = retrieve_user(uid)  # uid given: retrieve entry using uid
-    app.logger.debug("registerUser/output: {}".format(user_entry))
-    if user_entry:  # if an entry is found
-        result = {
-            'uid': user_entry['_id'],
-            'username': user_entry['username'],
-            'password': user_entry['password']
-        }
-    else:  # no entry found; return uid as -1, other values as blanks
-        result = {
-            'uid': -1,
-            'username': '',
-            'password': ''
-        }
-    return jsonify(result=result)
+    def get(self):
+        # variables
+        uid = request.args.get('uid', default=-1)
+        username = request.args.get('username', default='-1')
+        # checking for user in user_db
+        if uid == -1:  # if no uid given
+            app.logger.debug("usercheck/username: {}".format(username))
+            user_entry = retrieve_user(username=username)  # retrieve entry using username
+        else:
+            app.logger.debug("usercheck/uid: {}".format(uid))
+            user_entry = retrieve_user(uid)  # uid given: retrieve entry using uid
+        if user_entry:  # if an entry is found
+            result = {
+                'uid': user_entry['_id'],
+                'username': user_entry['username'],
+                'password': user_entry['password']
+            }
+        else:  # no entry found; return uid as -1, other values as blanks
+            result = {
+                'uid': -1,
+                'username': '',
+                'password': ''
+            }
+        return jsonify(result)
 
 
 def retrieve(val_include="default"):
@@ -110,25 +109,18 @@ def json_form(result, top):
     return data
 
 
-@app.route('/_pass_check')
-def pull_password():
+class PullPassword(Resource):
     """
     Retrieves hashed password for specified username
     """
-    username = request.args.get('username')
-    user = retrieve_user(username=username)
-    app.logger.debug("pullpassword/user: {}".format(user))
-    if user:
-        result = {'password': user['password']}
-    else:
-        result = {'password': None}
-    return jsonify(result=result)
-
-
-@app.route('/hidden')
-def delete():
-    user_db.timestable.delete_many({})
-    return 200
+    def get(self):
+        username = request.args.get('username')
+        user = retrieve_user(username)
+        if user:
+            result = {'password': user['password']}
+        else:
+            return 400
+        return jsonify(result)
 
 
 @app.route('/register', methods=["POST"])
@@ -137,6 +129,7 @@ def register():
     Inputs username and hashword into database, if it does not already
     exist. Returns
     """
+    app.logger.debug("registerUser/output: {}".format(1))
     username = request.args.get('username')
     password = request.args.get('password')
     temp_user = retrieve_user(username=username)
@@ -144,32 +137,32 @@ def register():
         if temp_user['username'] != username:
             return 400
     user = {
-        '_id': user_db.timestable.estimated_document_count() + 1,
+        '_id': user_db.timestable.count() + 1,
         'username': username,
         'password': password
     }
     user_db.timestable.insert_one(user)
     app.logger.debug("registerUser/user: {}".format(user['_id']))
     app.logger.debug("registerUser/user: {}".format(user))
-    return jsonify(result=user), 201
+    return jsonify(user), 201
 
 
-@app.route('/token')
-def token_generation():
+class TokenGeneration(Resource):
     """
     Checks if username and hashword (hashed password) exists in
     database. If so, generates and returns a token. Else, returns abort request
     """
-    username = request.args.get('username')
-    hashword = request.args.get('password')
-    user_info = retrieve_user(username=username)
-    if user_info:
-        if user_info['username'] == username and user_info['hashword'] == hashword:
-            expiration = 600
-            s = generate_auth_token(SECRET_KEY, expiration)
-            result = {"token": s, "duration": str(expiration)}
-            return jsonify(result=result)
-    return "", 401
+    def get(self):
+        username = request.args.get('username')
+        hashword = request.args.get('password')
+        user_info = retrieve_user(username=username)
+        if user_info:
+            if user_info['username'] == username and user_info['hashword'] == hashword:
+                expiration = 600
+                s = generate_auth_token(SECRET_KEY, expiration)
+                result = {"token": s, "duration": str(expiration)}
+                return jsonify(result=result)
+        return 401
 
 
 class ListAll(Resource):
@@ -210,7 +203,9 @@ class ListCloseOnly(Resource):
 
 # Create routes
 # Another way, without decorators
-
+api.add_resource(UserCheck, '/user_check')
+api.add_resource(TokenGeneration, '/token')
+api.add_resource(PullPassword, '/pass_check')
 api.add_resource(ListAll, '/listAll/<string:dtype>', '/listAll/')
 api.add_resource(ListOpenOnly, '/listOpenOnly/<string:dtype>', '/listOpenOnly/')
 api.add_resource(ListCloseOnly, '/listCloseOnly/<string:dtype>', '/listCloseOnly/')
