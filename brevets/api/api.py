@@ -172,7 +172,7 @@ class TokenGeneration(Resource):
             if user_info['username'] == str(username) and user_info['password'] == str(password):
                 expiration = 600
                 s = generate_auth_token(SECRET_KEY, expiration)
-                return s.dumps({'username': username})
+                return str(s.dumps({'username': username}))
         return "", 401
 
 
