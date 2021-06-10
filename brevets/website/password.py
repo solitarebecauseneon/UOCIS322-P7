@@ -1,9 +1,9 @@
-from passlib.apps import custom_app_context as pwd_context
+from passlib.hash import sha256_crypt as pwd_context
 
 
 def hash_password(password):
     """returns hashed password for user_db storage"""
-    return pwd_context.encrypt(password)
+    pwd_context.using(salt="some string").encrypt(password)
 
 
 def verify_password(password, hashVal):

@@ -121,7 +121,6 @@ def home():
 @app.route("/login", methods=["GET", "POST"])
 def login():
     form = LoginForm()
-    proceed = True
     # Collect form data
     if form.validate_on_submit() and request.method == "POST" and ("username" and "password" in request.form):
         username = form.username.data
@@ -134,32 +133,31 @@ def login():
         r_text = json.loads(r.text)
         if r_text['uid'] == -1:  # no matching username found in database
             flash("Username does not exist!")
-            proceed = False
+            return render_template('login.html', form=form)
         temp_user.set_id(r_text['uid'])
         r = requests.get(URL_TRACE + '/pass_check', params=temp_user.db_dict())
-        if r.status_code == 400:
+        r_text = json.loads(r.text)
+        if r_text['password'] is None:
             flash("Incorrect password!")
             return render_template('login.html', form=form)
-        r_text = json.loads(r.text)
+
         app.logger.debug("login/passcheck: {}".format(r_text['password']))
-        app.logger.debug("login/password: {}".format(password))
-        if not r_text['password'] == password:  # password failed!
+        if r_text['password'] != password:  # password failed!
             flash("Invalid password!")
-            proceed = False
+            return render_template('login.html', form=form)
         # Login user, if nothing went wrong finding user info in database
-        if proceed:
-            if login_user(temp_user, remember=remember):
-                flash("Logged in!")
-                flash("I'll remember you") if remember else None
-                r = requests.get(URL_TRACE + '/token', params=temp_user.db_dict())
-                if r.status_code == 401:
-                    return render_template('login_html', form=form)
-                r_text = json.loads(r.text)
-                temp_user.set_token(r_text['token'])
-                next_page = request.args.get("next")
-                if not is_safe_url(next_page):
-                    abort(400)
-                return redirect(next_page or url_for('index'))
+        if login_user(temp_user, remember=remember):
+            flash("Logged in!")
+            flash("I'll remember you") if remember else None
+            r = requests.get(URL_TRACE + '/token', params=temp_user.db_dict())
+            if r.status_code == 401:
+                return render_template('login_html', form=form)
+            r_text = json.loads(r.text)
+            temp_user.set_token(r_text['token'])
+            next = request.args.get("next")
+            if not is_safe_url(next):
+                abort(400)
+            return redirect(next or url_for('index'))
 
     return render_template('login.html', form=form)
 

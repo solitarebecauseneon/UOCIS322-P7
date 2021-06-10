@@ -117,11 +117,12 @@ class PullPassword(Resource):
     def get(self):
         username = request.args.get('username')
         user = retrieve_user(username=username)
+        app.logger.debug("pullpassword/user: {}".format(user))
         if user:
             result = {'password': user['password']}
         else:
-            return "", 400
-        return jsonify(result), 200
+            result = {'password': None}
+        return jsonify(result)
 
 
 @app.route('/hidden')
