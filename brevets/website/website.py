@@ -164,28 +164,29 @@ def login():
     return render_template('login.html', form=form)
 
 
-@app.route("/add_user", methods=["POST"])
+@app.route("/add_user", methods=["GET", "POST"])
 def new_user():
     form = RegisterForm()
-    if form.validate_on_submit() and request.method == "POST" and ("username" and "password" in request.form):
-        username = form.username.data
-        password = hash_password(form.password.data)
-        temp_user = User(-1, username, password)
-        # check if username already exists
-        r = requests.get(URL_TRACE + '/user_check', params=temp_user.db_dict())
-        r_text = json.loads(r.text)
-        if r_text['username'] == username:  # username already exists!
-            flash("Username taken! Try again.")
-            return render_template('register.html', form=form)
-        else:  # if username does not already exist
-            r = requests.post(URL_TRACE + '/register', params=temp_user.db_dict())
-            if r.status_code == 400:
-                return render_template('register.html', form=form)
-            app.logger.debug("register/reg_success: {}".format(r.text))
+    if request.method == "POST":
+        if form.validate_on_submit() and ("username" and "password" in request.form):
+            username = form.username.data
+            password = hash_password(form.password.data)
+            temp_user = User(-1, username, password)
+            # check if username already exists
+            r = requests.get(URL_TRACE + '/user_check', params=temp_user.db_dict())
             r_text = json.loads(r.text)
-            app.logger.debug("register/reg_success: {}".format(r_text))
-            temp_user.set_id(r_text['_id'])
-            return redirect(url_for('login'))
+            if r_text['username'] == username:  # username already exists!
+                flash("Username taken! Try again.")
+                return render_template('register.html', form=form)
+            else:  # if username does not already exist
+                r = requests.post(URL_TRACE + '/register', params=temp_user.db_dict())
+                if r.status_code == 400:
+                    return render_template('register.html', form=form)
+                app.logger.debug("register/reg_success: {}".format(r.text))
+                r_text = json.loads(r.text)
+                app.logger.debug("register/reg_success: {}".format(r_text))
+                temp_user.set_id(r_text['_id'])
+                return redirect(url_for('login'))
 
     return render_template('register.html', form=form)
 
