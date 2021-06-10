@@ -185,7 +185,7 @@ class ListAll(Resource):
         token = request.args.get('token', default='nope')
         token = token.replace('"', "")
         leng = len(token)
-        if not verify_auth_token(SECRET_KEY, bin(token)):
+        if not verify_auth_token(SECRET_KEY, token):
             return 401
         top = request.args.get('top', default=-1, type=int)
         app.logger.debug("top: {}".format(top))
@@ -199,7 +199,7 @@ class ListOpenOnly(Resource):
         token = request.args.get('token', default='nope')
         token = token.replace('"', "")
         leng = len(token)
-        if not verify_auth_token(SECRET_KEY, bin(token)):
+        if not verify_auth_token(SECRET_KEY, token):
             return 401
         top = request.args.get('top', default=-1, type=int)
         app.logger.debug("top: {}".format(top))
@@ -213,7 +213,7 @@ class ListCloseOnly(Resource):
         token = request.args.get('token', default='nope')
         token = token.replace('"', "")
         leng = len(token)
-        if not verify_auth_token(SECRET_KEY, bin(token)):
+        if not verify_auth_token(SECRET_KEY, token):
             return 401
         top = request.args.get('top', default=-1, type=int)
         app.logger.debug("top: {}".format(top))
