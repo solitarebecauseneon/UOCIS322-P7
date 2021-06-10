@@ -36,15 +36,11 @@ USERS = {}
 @login_manager.user_loader
 def load_user(uid):
     if str(uid) in USERS.keys():
+        USERS[str(uid)] = current_user
         return USERS[str(uid)]
     else:
-        r = requests.get(URL_TRACE + '/user_check', params={'uid': int(uid)})
-        app.logger.debug(r.text)
-        r_text = json.loads(r.text)
-        app.logger.debug(r_text)
-        temp = User(r_text['uid'], r_text['username'], r_text['password'])
-        USERS[str(uid)] = temp
-    return temp
+        USERS[str(uid)] = current_user
+    return USERS[str(uid)]
 
 
 login_manager.init_app(app)
