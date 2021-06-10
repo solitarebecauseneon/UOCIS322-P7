@@ -125,7 +125,7 @@ def login():
     # Collect form data
     if form.validate_on_submit() and request.method == "POST" and ("username" and "password" in request.form):
         username = form.username.data
-        password = hash_password(form.password.data).replace(".", "")
+        password = hash_password(form.password.data)
         temp_user = User(-1, username, password)
         remember = request.form.get("remember", "false") == "true"
 
@@ -166,7 +166,7 @@ def new_user():
     form = RegisterForm()
     if form.validate_on_submit() and request.method == "POST" and ("username" and "password" in request.form):
         username = form.username.data
-        password = hash_password(form.password.data).replace(".", "")
+        password = hash_password(form.password.data)
         app.logger.debug("register/username: {}".format(username))
         app.logger.debug("register/password: {}".format(password))
         temp_user = User(-1, username, password)
@@ -179,7 +179,7 @@ def new_user():
             flash("Username taken! Try again.")
             return render_template('register.html', form=form)
         else:  # if username does not already exist
-            r = requests.get(URL_TRACE + '/register', params=temp_user.db_dict())
+            r = requests.post(URL_TRACE + '/register', params=temp_user.db_dict())
             if r.status_code == 400:
                 return render_template('register.html', form=form)
             app.logger.debug("register/reg_success: {}".format(r.text))

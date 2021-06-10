@@ -204,7 +204,7 @@ class ListCloseOnly(Resource):
 # Create routes
 # Another way, without decorators
 api.add_resource(UserCheck, '/user_check')
-api.add_resource(RegisterUser, '/register')
+api.add_resource(RegisterUser, '/register', methods=["POST"])
 api.add_resource(TokenGeneration, '/token')
 api.add_resource(ListAll, '/listAll/<string:dtype>', '/listAll/')
 api.add_resource(ListOpenOnly, '/listOpenOnly/<string:dtype>', '/listOpenOnly/')
