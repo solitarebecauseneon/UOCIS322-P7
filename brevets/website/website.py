@@ -34,7 +34,9 @@ URL_TRACE = "http://" + os.environ['BACKEND_ADDR'] + ":" + os.environ['BACKEND_P
 @login_manager.user_loader
 def load_user(uid):
     r = requests.get(URL_TRACE + '/user_check', params={'uid': uid})
+    app.logger.debug(r.text)
     r_text = json.loads(r.text)
+    app.logger.debug(r_text)
     temp = User(r_text['uid'], r_text['username'], r_text['password'])
     return temp
 

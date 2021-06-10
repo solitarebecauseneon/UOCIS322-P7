@@ -157,12 +157,12 @@ class TokenGeneration(Resource):
     database. If so, generates and returns a token. Else, returns abort request
     """
     def get(self):
-        username = request.args.get('username')
-        password = request.args.get('password')
+        username = str(request.args.get('username'))
+        password = str(request.args.get('password'))
         user_info = retrieve_user(username=username)
         if user_info:
             app.logger.debug("/TokenGeneration/userinfo: {}".format(user_info))
-            if user_info['username'] == username and user_info['password'] == password:
+            if user_info['username'] == str(username) and user_info['password'] == str(password):
                 expiration = 600
                 s = generate_auth_token(SECRET_KEY, expiration)
                 result = {"token": s, "duration": str(expiration)}
