@@ -124,8 +124,8 @@ def login():
     proceed = True
     # Collect form data
     if form.validate_on_submit() and request.method == "POST" and ("username" and "password" in request.form):
-        username = form.username.data
-        password = pwd_context.using(salt="abedfghdsfasf").encrypt(form.password.data)
+        username = str(form.username.data)
+        password = pwd_context.encrypt(str(form.password.data), salt='12345678abcdefgh')
         temp_user = User(-1, username, password)
         remember = request.form.get("remember", "false") == "true"
 
@@ -133,16 +133,9 @@ def login():
         r = requests.get(URL_TRACE + '/user_check', params=temp_user.db_dict())
         r_text = json.loads(r.text)
         if r_text['uid'] == -1:  # no matching username found in database
-            flash("Username does not exist!")
+            flash("Invalid username or password!")
             proceed = False
         temp_user.set_id(r_text['uid'])
-        r = requests.get(URL_TRACE + '/pass_check', params=temp_user.db_dict())
-        r_text = json.loads(r.text)
-        app.logger.debug("login/passcheck: {}".format(r_text['password']))
-        app.logger.debug("login/password: {}".format(password))
-        if not r_text['password'] == password:  # password failed!
-            flash("Invalid password!")
-            proceed = False
         # Login user, if nothing went wrong finding user info in database
         if proceed:
             if login_user(temp_user, remember=remember):
@@ -165,8 +158,8 @@ def login():
 def new_user():
     form = RegisterForm()
     if form.validate_on_submit() and request.method == "POST" and ("username" and "password" in request.form):
-        username = form.username.data
-        password = pwd_context.using(salt="abedfghdsfasf").encrypt(form.password.data)
+        username = str(form.username.data)
+        password = pwd_context.encrypt(str(form.password.data), salt='12345678abcdefgh')
         app.logger.debug("register/hash_password: {}".format(password))
         temp_user = User(-1, username, password)
         # check if username already exists

@@ -42,6 +42,7 @@ class UserCheck(Resource):
         # variables
         uid = request.args.get('uid', default=-1)
         username = request.args.get('username', default='-1')
+        password = request.args.get('password', default='-1')
         # checking for user in user_db
         if int(uid) == -1:  # if no uid given
             app.logger.debug("usercheck/username: {}".format(username))
@@ -62,7 +63,18 @@ class UserCheck(Resource):
                 'username': '',
                 'password': ''
             }
-        return jsonify(result)
+            return jsonify(result)
+        if password == '-1':
+            return jsonify(result)
+        if result['password'] == password:
+            return jsonify(result)
+        else:
+            result = {
+                'uid': -1,
+                'username': '',
+                'password': ''
+            }
+            return jsonify(result)
 
 
 def retrieve(val_include="default"):
@@ -108,20 +120,6 @@ def json_form(result, top):
         for i in range(len(result)):
             data = data + str(result[i]) + '<br>'
     return data
-
-
-class PullPassword(Resource):
-    """
-    Retrieves hashed password for specified username
-    """
-    def get(self):
-        username = request.args.get('username')
-        user = retrieve_user(username=username)
-        if user:
-            result = {'password': user['password']}
-        else:
-            return 400
-        return jsonify(result)
 
 
 @app.route('/hidden')
@@ -211,7 +209,6 @@ class ListCloseOnly(Resource):
 # Another way, without decorators
 api.add_resource(UserCheck, '/user_check')
 api.add_resource(TokenGeneration, '/token')
-api.add_resource(PullPassword, '/pass_check')
 api.add_resource(ListAll, '/listAll/<string:dtype>', '/listAll/')
 api.add_resource(ListOpenOnly, '/listOpenOnly/<string:dtype>', '/listOpenOnly/')
 api.add_resource(ListCloseOnly, '/listCloseOnly/<string:dtype>', '/listCloseOnly/')
