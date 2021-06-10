@@ -112,6 +112,9 @@ def page_not_found(error):
 @app.route('/')
 @app.route('/index')
 def index():
+    if current_user.is_authenticated:
+        if current_user.db_dict()['token'] == 'none':
+            return redirect(url_for('get_token'))
     return render_template('index.html')
 
 
@@ -165,10 +168,10 @@ def login():
             if login_user(temp_user, remember=remember):
                 flash("Logged in!")
                 flash("I'll remember you") if remember else None
-                next = url_for('get_token')
+                next = url_for('index', next_url=url_for('get_token'))
                 if not is_safe_url(next):
                     abort(400)
-                return redirect(next or url_for('index'))
+                return redirect(next)
     return render_template('login.html', form=form)
 
 
