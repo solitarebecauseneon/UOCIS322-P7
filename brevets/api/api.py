@@ -123,28 +123,29 @@ class PullPassword(Resource):
         return jsonify(result)
 
 
-class RegisterUser(Resource):
+@app.route('/register', methods=["POST"])
+def register():
     """
     Inputs username and hashword into database, if it does not already
     exist. Returns
     """
-    def get(self):
-        username = request.args.get('username')
-        password = request.args.get('password')
-        temp_user = retrieve_user(username=username)
-        if temp_user:
-            if temp_user['username'] != username:
-                return 400
-        user = {
-            'username': username,
-            'password': password
-        }
-        user_db.timestable.insert_one(user)
-        temp = user_db.timestable.find_one({'username': user['username']})
-        user['uid'] = temp['_id']
-        app.logger.debug("registerUser/user: {}".format(user['uid']))
-        app.logger.debug("registerUser/user: {}".format(user))
-        return jsonify(user), 201
+    app.logger.debug("registerUser/output: {}".format(1))
+    username = request.args.get('username')
+    password = request.args.get('password')
+    temp_user = retrieve_user(username=username)
+    if temp_user:
+        if temp_user['username'] != username:
+            return 400
+    user = {
+        'username': username,
+        'password': password
+    }
+    user_db.timestable.insert_one(user)
+    temp = user_db.timestable.find_one({'username': user['username']})
+    user['uid'] = temp['_id']
+    app.logger.debug("registerUser/user: {}".format(user['uid']))
+    app.logger.debug("registerUser/user: {}".format(user))
+    return jsonify(user), 201
 
 
 class TokenGeneration(Resource):
@@ -204,7 +205,6 @@ class ListCloseOnly(Resource):
 # Create routes
 # Another way, without decorators
 api.add_resource(UserCheck, '/user_check')
-api.add_resource(RegisterUser, '/register', methods=["POST"])
 api.add_resource(TokenGeneration, '/token')
 api.add_resource(ListAll, '/listAll/<string:dtype>', '/listAll/')
 api.add_resource(ListOpenOnly, '/listOpenOnly/<string:dtype>', '/listOpenOnly/')
