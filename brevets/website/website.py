@@ -221,7 +221,7 @@ def listeverything():
     if top != 0 and top != -1:
         r = requests.get(temp_path, params={'top': top, 'token': s})
     else:
-        r = requests.get(temp_path)
+        r = requests.get(temp_path, params={'token': s})
         app.logger.debug("r.text: {}".format(r.status_code))
     if r.status_code == 401:
         return abort(401)
@@ -242,7 +242,7 @@ def listopenonly():
     if top != 0 and top != -1:
         r = requests.get(temp_path, params={'top': top, 'token': s})
     else:
-        r = requests.get(temp_path)
+        r = requests.get(temp_path, params={'token': s})
     if r.status_code == 401:
         return abort(401)
     app.logger.debug("r.text: {}".format(r.status_code))
@@ -262,7 +262,7 @@ def listcloseonly():
     if top != 0 and top != -1:
         r = requests.get(temp_path, params={'top': top, 'token': s})
     else:
-        r = requests.get(temp_path)
+        r = requests.get(temp_path, params={'token': s})
     if r.status_code == 401:
         return abort(401)
     app.logger.debug("r.text: {}".format(r.status_code))

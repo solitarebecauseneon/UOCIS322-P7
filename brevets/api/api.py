@@ -174,7 +174,7 @@ class TokenGeneration(Resource):
             if user_info['username'] == str(username) and user_info['password'] == str(password):
                 expiration = 600
                 s = generate_auth_token(SECRET_KEY, expiration)
-                result = str(s.dumps({'username': username}))
+                result = s.dumps({'username': username}).decode('utf-8')
                 app.logger.debug("Fun stuff! {}".format(result))
                 return jsonify(result)
         return "", 401
@@ -182,9 +182,7 @@ class TokenGeneration(Resource):
 
 class ListAll(Resource):
     def get(self, dtype='json'):
-        token = request.args.get('token', default='nope')
-        token = token.replace('"', "")
-        leng = len(token)
+        token = request.args.get('token', default='nope').encode('utf-8')
         if not verify_auth_token(SECRET_KEY, token):
             return 401
         top = request.args.get('top', default=-1, type=int)
@@ -196,9 +194,7 @@ class ListAll(Resource):
 
 class ListOpenOnly(Resource):
     def get(self, dtype='json'):
-        token = request.args.get('token', default='nope')
-        token = token.replace('"', "")
-        leng = len(token)
+        token = request.args.get('token', default='nope').encode('utf-8')
         if not verify_auth_token(SECRET_KEY, token):
             return 401
         top = request.args.get('top', default=-1, type=int)
@@ -210,9 +206,7 @@ class ListOpenOnly(Resource):
 
 class ListCloseOnly(Resource):
     def get(self, dtype='json'):
-        token = request.args.get('token', default='nope')
-        token = token.replace('"', "")
-        leng = len(token)
+        token = request.args.get('token', default='nope').encode('utf-8')
         if not verify_auth_token(SECRET_KEY, token):
             return 401
         top = request.args.get('top', default=-1, type=int)
