@@ -170,7 +170,7 @@ def new_user():
         # check if username already exists
         r = requests.get(URL_TRACE + '/user_check', params=temp_user.db_dict())
         r_text = json.loads(r.text)
-        if r_text['username'] == username:  # username already exists!
+        if r_text['username'] == str(username):  # username already exists!
             flash("Username taken! Try again.")
             return render_template('register.html', form=form)
         else:  # if username does not already exist
