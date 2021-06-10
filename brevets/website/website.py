@@ -125,19 +125,18 @@ def home():
 
 @app.route('/get_token')
 def get_token():
-    if current_user.is_authenticated and current_user.db_dict()['token'] == 'nope':
-        s = current_user.db_dict()
-        uid = s['uid']
-        r = requests.get(URL_TRACE + '/token', params=s)
-        app.logger.debug("/get_token/token: {}".format(r.text))
-        if r.status_code == 401:
-            abort(401)
-        current_user.set_token(r.text)
-        if str(uid) in USERS.keys():
-            USERS[str(uid)] = current_user
-        else:
-            USERS[str(uid)] = current_user
-        app.logger.debug("current_user: {}".format(current_user))
+    s = current_user.db_dict()
+    uid = s['uid']
+    r = requests.get(URL_TRACE + '/token', params=s)
+    app.logger.debug("/get_token/token: {}".format(r.text))
+    if r.status_code == 401:
+        abort(401)
+    current_user.set_token(r.text)
+    if str(uid) in USERS.keys():
+        USERS[str(uid)] = current_user
+    else:
+        USERS[str(uid)] = current_user
+    app.logger.debug("current_user: {}".format(current_user))
     return redirect(url_for('index'))
 
 
