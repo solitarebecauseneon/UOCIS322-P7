@@ -129,20 +129,22 @@ def login():
         remember = form.remember.data("remember", "false") == "true"
 
         # Check if user exists in database and if password is correct
-        r = requests.get(URL_TRACE + '/user_check', params=temp_user.db_dict())
-        r_text = json.loads(r.text)
-        if r_text['uid'] == -1:  # no matching username found in database
+        r1 = requests.get(URL_TRACE + '/user_check', params=temp_user.db_dict())
+        app.logger.debug("login/usercheck!!!: {}".format(r1))
+        r1_text = json.loads(r1.text)
+        if r1_text['uid'] == -1:  # no matching username found in database
             flash("Username does not exist!")
             return render_template('login.html', form=form)
-        temp_user.set_id(r_text['uid'])
-        r = requests.get(URL_TRACE + '/pass_check', params=temp_user.db_dict())
-        r_text = json.loads(r.text)
-        if r_text['password'] is None:
+        temp_user.set_id(r1_text['uid'])
+        r2 = requests.get(URL_TRACE + '/pass_check', params=temp_user.db_dict())
+        app.logger.debug("login/passcheck!!!: {}".format(r2))
+        r2_text = json.loads(r2.text)
+        if r2_text['password'] is None:
             flash("Incorrect password!")
             return render_template('login.html', form=form)
 
-        app.logger.debug("login/passcheck: {}".format(r_text['password']))
-        if r_text['password'] != password:  # password failed!
+        app.logger.debug("login/passcheck: {}".format(r2_text['password']))
+        if r2_text['password'] != password:  # password failed!
             flash("Invalid password!")
             return render_template('login.html', form=form)
         # Login user, if nothing went wrong finding user info in database
