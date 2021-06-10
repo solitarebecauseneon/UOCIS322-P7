@@ -141,18 +141,19 @@ def login():
         elif r_text['password'] == '0':  # update temp_user.id with database id; proceed to login
             temp_user.set_id(r.text[0])
         # Login user, if nothing went wrong finding user info in database
-        if login_user(temp_user, remember=remember) and proceed:
-            flash("Logged in!")
-            flash("I'll remember you") if remember else None
-            r = requests.get(URL_TRACE + '/token', params=temp_user.db_dict())
-            if r.status_code == 401:
-                return render_template('login_html', form=form)
-            r_text = json.loads(r.text)
-            temp_user.set_token(r_text['token'])
-            next_page = request.args.get("next")
-            if not is_safe_url(next_page):
-                abort(400)
-            return redirect(next_page or url_for('index'))
+        if proceed:
+            if login_user(temp_user, remember=remember):
+                flash("Logged in!")
+                flash("I'll remember you") if remember else None
+                r = requests.get(URL_TRACE + '/token', params=temp_user.db_dict())
+                if r.status_code == 401:
+                    return render_template('login_html', form=form)
+                r_text = json.loads(r.text)
+                temp_user.set_token(r_text['token'])
+                next_page = request.args.get("next")
+                if not is_safe_url(next_page):
+                    abort(400)
+                return redirect(next_page or url_for('index'))
 
     return render_template('login.html', form=form)
 
@@ -186,7 +187,7 @@ def new_user():
 @app.route('/logout')
 @login_required
 def logout():
-    current_user.token = ""
+    current_user.set_token("")
     logout_user()
     flash("Logged out.")
     return redirect(url_for("index"))

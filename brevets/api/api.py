@@ -134,8 +134,10 @@ class RegisterUser(Resource):
     def get(self):
         username = request.args.get('username')
         password = request.args.get('password')
-        if retrieve_user(username=username)['username'] != username:
-            return 400
+        temp_user = retrieve_user(username=username)
+        if temp_user:
+            if temp_user['username'] != username:
+                return 400
         user = {
             'username': username,
             'password': password
