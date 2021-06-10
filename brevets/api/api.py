@@ -172,8 +172,7 @@ class TokenGeneration(Resource):
             if user_info['username'] == str(username) and user_info['password'] == str(password):
                 expiration = 600
                 s = generate_auth_token(SECRET_KEY, expiration)
-                result = {"token": s, "duration": str(expiration)}
-                return jsonify(result=result)
+                return s
         return "", 401
 
 
