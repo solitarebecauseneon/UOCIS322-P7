@@ -33,7 +33,7 @@ URL_TRACE = "http://" + os.environ['BACKEND_ADDR'] + ":" + os.environ['BACKEND_P
 
 @login_manager.user_loader
 def load_user(uid):
-    r = requests.get(URL_TRACE + '/user_check', params={'uid': uid})
+    r = requests.get(URL_TRACE + '/_user_check', params={'uid': uid})
     r_text = json.loads(r.text)
     return r_text['uid']
 
@@ -129,14 +129,14 @@ def login():
         remember = form.remember.data("remember", "false") == "true"
 
         # Check if user exists in database and if password is correct
-        r1 = requests.get(URL_TRACE + '/user_check', params=temp_user.db_dict())
+        r1 = requests.get(URL_TRACE + '/_user_check', params=temp_user.db_dict())
         app.logger.debug("login/usercheck!!!: {}".format(r1))
         r1_text = json.loads(r1.text)
         if r1_text['uid'] == -1:  # no matching username found in database
             flash("Username does not exist!")
             return render_template('login.html', form=form)
         temp_user.set_id(r1_text['uid'])
-        r2 = requests.get(URL_TRACE + '/pass_check', params=temp_user.db_dict())
+        r2 = requests.get(URL_TRACE + '/_pass_check', params=temp_user.db_dict())
         app.logger.debug("login/passcheck!!!: {}".format(r2))
         r2_text = json.loads(r2.text)
         if r2_text['password'] is None:
@@ -172,7 +172,7 @@ def new_user():
         password = hash_password(form.password.data)
         temp_user = User(-1, username, password)
         # check if username already exists
-        r = requests.get(URL_TRACE + '/user_check', params=temp_user.db_dict())
+        r = requests.get(URL_TRACE + '/_user_check', params=temp_user.db_dict())
         r_text = json.loads(r.text)
         if r_text['username'] == username:  # username already exists!
             flash("Username taken! Try again.")

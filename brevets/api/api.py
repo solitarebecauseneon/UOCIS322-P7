@@ -62,7 +62,7 @@ def user_check():
             'username': '',
             'password': ''
         }
-    return jsonify(result=result), 200
+    return jsonify(result=result)
 
 
 def retrieve(val_include="default"):
@@ -122,7 +122,7 @@ def pull_password():
         result = {'password': user['password']}
     else:
         result = {'password': None}
-    return jsonify(result=result), 200
+    return jsonify(result=result)
 
 
 @app.route('/hidden')
