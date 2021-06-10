@@ -8,6 +8,7 @@ SECRET_KEY = 'test1234@#$'
 
 def generate_auth_token(expiration=600):
     s = Serializer(SECRET_KEY, expires_in=expiration)
+    print(f"Token:{s.dumps({'id': 5, 'name': 'Ryan'})}")
     return s.dumps({'id': 5, 'name': 'Ryan'})
 
 
@@ -19,7 +20,7 @@ def verify_auth_token(token):
         return "Expired token!"  # valid token, but expired
     except BadSignature:
         return "Invalid token!"  # invalid token
-    return f"Success! Welcome {data['username']}."
+    return f"Success! Welcome!"
 
 
 if __name__ == "__main__":
