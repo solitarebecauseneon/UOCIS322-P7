@@ -35,8 +35,6 @@ USERS = {}
 
 @login_manager.user_loader
 def load_user(uid):
-    if str(uid) not in USERS.keys():
-        USERS[str(uid)] = current_user
     return USERS[str(uid)]
 
 
@@ -157,9 +155,11 @@ def login():
         r = requests.get(URL_TRACE + '/user_check', params=temp_user.db_dict())
         r_text = json.loads(r.text)
         temp_user.set_id(r_text['uid'])
+        uid = temp_user.db_dict['uid']
         # Login user, if nothing went wrong finding user info in database
         if proceed:
             if login_user(temp_user, remember=remember):
+                USERS[str(uid)] = temp_user
                 flash("Logged in!")
                 flash("I'll remember you") if remember else None
                 next = url_for('get_token')
