@@ -133,6 +133,13 @@ def get_token():
     return redirect(url_for('index'))
 
 
+@app.route('/_check')
+def check():
+    s = current_user.db_dict()
+    app.logger.debug(s)
+    return s
+
+
 @app.route("/login", methods=["GET", "POST"])
 def login():
     form = LoginForm()
