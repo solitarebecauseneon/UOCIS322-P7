@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+   <head>
+      <title>ACP Controle Times</title>
+      <meta charset="utf-8">
+      <!-- 'viewport' is used by bootstrap to respond to device size -->
+      <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+      <!-- Bootstrap includes javascript and css  (must follow jquery) -->
+      <link
+         rel="stylesheet"
+         href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css"
+         integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l"
+         crossorigin="anonymous">
+      <!-- Javascript:  JQuery from a content distribution network (CDN) -->
+      <script
+         src="https://code.jquery.com/jquery-3.5.1.min.js"
+         integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0="
+         crossorigin="anonymous"></script>
+      <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"
+         integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN"
+         crossorigin="anonymous"></script>
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js"
+         integrity="sha384-+YQ4JLhjyBLPDQt//I+STsc9iw4uQqACwlvpslubQzn4u2UU2UFM80nGisd026JF"
+         crossorigin="anonymous"></script>
+   </head>
+   <!-- Our own stylesheet -->
+   <link rel="stylesheet" href="/static/css/index.css" />
+   <body>
+      <div class="container">
+         <h1>Results</h1>
+         <p>Press 'submit' to output results below</p>
+         <div class="col-md-4">
+            <p>Select 'open', 'close', or 'all' to get specific brevet times</p>
+               <select name="open_close_select" id="select1">
+                  <option value="default">all</option>
+                  <option value="open">open</option>
+                  <option value="close">close</option>
+               </select>
+            <p></p>
+            <p></p>
+         </div>
+         <div class="col-md-4">
+            <p>Select 'json' or 'csv' display format</p>
+               <select name="json_csv_select" id="select2">
+                  <option value="json">json</option>
+                  <option value="csv">csv</option>
+               </select>
+            <p></p>
+            <p></p>
+         </div>
+         <div class="col-md-4">
+            <p>Enter a number 'x' to see the top 'x' results (or 0 for all results)</p>
+               <input type="number" name="top_select" id="select3"
+               min="0" max="21" value="0">
+            <p></p>
+            <p></p>
+         </div>
+         <div class="col-md-4">
+            <button id="submit">Submit</button>
+         </div>
+         <div class="col-md-12">
+            <p id="message_output"> </p>
+         </div>
+         <script>
+            var SCRIPT_ROOT = {{ request.script_root|tojson|safe }} ;
+
+            $('#submit').click(
+               function(e)
+               {
+                  e.preventDefault();
+                  var path = "/listevery"
+                  var select1 = document.getElementById('select1').value;
+                  var select2 = document.getElementById('select2').value;
+                  var select3 = document.getElementById('select3').value;
+                  if (select1 == "open") {
+                     path = "/listopen"
+                  } else if (select1 == "close") {
+                     path = "/listclose"
+                  }
+                  var end_path = SCRIPT_ROOT + path
+                  $.getJSON(end_path, {json_csv: select2, top: select3}).done(
+                     function(data) {
+                        var message = document.getElementById("message_output");
+                        console.log("Got a response: ");
+                        console.log(data);
+                        message.innerHTML = data;
+                     }
+                  ).fail(function(err){
+                     console.log("Error!");
+                     console.log(err);
+                  });
+               }
+            )
+         </script>
+      </div>
+   </body>
+</html>

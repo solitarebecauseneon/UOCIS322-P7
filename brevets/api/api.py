@@ -1,21 +1,74 @@
 # Streaming Service
 
-from flask import Flask, request
+from flask import Flask, request, redirect, url_for, flash, jsonify
+import random
+from testToken import generate_auth_token, verify_auth_token
 import os
 from flask_restful import Resource, Api
 from pymongo import MongoClient
 
+import time
 
+# API set-up
 app = Flask(__name__)
+SECRET_KEY = '\xf3\x88G\x1b\xc4\xbcf\xef\xf0\xe6\xb7\x1d'
+app.secret_key = SECRET_KEY
 api = Api(app)
 
+# Database set-up
 client = MongoClient('mongodb://' + os.environ['MONGODB_HOSTNAME'], 27017)
 db = client.brevetdb
+user_db = client.userdb
+
+
+def retrieve_user(uid=-2, username=""):
+    """Returns user data as a list; can use user id (uid) or username to retrieve"""
+    if username != "":
+        return user_db.timestable.findOne(username=username)
+    if uid == -2:
+        return user_db.timestable.find()
+    return user_db.timestable.findOne(id=int(uid))
+
+
+class UserCheck(Resource):
+    """
+    returns a tuple, (uid:int, username:str, password:str)
+
+    uid: returns '_id' element from user_db; if -1 on exit,
+    no entry matching uid or username was found in user_db
+    username: returns 'username' element from user_db; if
+    blank on exit, no entry found
+    password: returns '0' if password matches one found in user_db;
+    returns 'password' element from user_db if User class being created;
+    returns '-1' if password does not match user_db's 'password' element
+
+    """
+    def get(self):
+        # variables
+        uid = request.args.get('uid', default=-1)
+        username = request.args.get('username', default='-1')
+        password = request.args.get('password', default='-1')
+
+        # checking for user in user_db
+        if uid == -1:  # if no uid given
+            user_entry = retrieve_user(username=username)  # retrieve entry using username
+        else:
+            user_entry = retrieve_user(uid)  # uid given: retrieve entry using uid
+        if user_entry:  # if an entry is found
+            if password == '-1':  # if password is default, return all for User class creation
+                result = (user_entry['_id'], user_entry['username'], user_entry['password'])
+            elif user_entry['password'] == password:  # password is not default; check if password match db password
+                result = (user_entry['_id'], user_entry['username'], '0')
+            else:  # password does NOT match database entry
+                result = (user_entry['_id'], user_entry['username'], '-1')
+        else:  # no entry found; return uid as -1, other values as blanks
+            result = (-1, '', '')
+        return jsonify(result)
 
 
 def retrieve(val_include="default"):
     """
-    retrieves all data from database
+    retrieves all data from brevets database
     """
     app.logger.debug("Pulling data from db")
     temp = db.timestable.find()
@@ -28,7 +81,7 @@ def retrieve(val_include="default"):
         if val_include == "closed":
             del i['open_time']
         result.append(i)
-    app.logger.debug("MangoDB documents: {}".format(result))
+    app.logger.debug("MongoDB documents: {}".format(result))
     return result
 
 
@@ -58,9 +111,47 @@ def json_form(result, top):
     return data
 
 
+class RegisterUser(Resource):
+    """
+    Inputs username and hashword into database, if it does not already
+    exist. Returns
+    """
+    def get(self):
+        username = request.args.get('username')
+        hashword = request.args.get('password')
+        if retrieve_user(username)[username] != username:
+            return 400
+        user = {
+            'username': username,
+            'hashword': hashword
+        }
+        user_db.timestable.insert_one(user)
+        user['uid'] = user_db.timestable.find(user['username'])['_id']
+        return jsonify(user), 201
+
+
+class TokenGeneration(Resource):
+    """
+    Checks if username and hashword (hashed password) exists in
+    database. If so, generates and returns a token. Else, returns abort request
+    """
+    def get(self):
+        username = request.args.get('username')
+        hashword = request.args.get('password')
+        user_info = retrieve_user(username=username)
+        if user_info['username'] == username and user_info['hashword'] == hashword:
+            expiration = 600
+            s = generate_auth_token(SECRET_KEY, expiration)
+            result = {"token": s, "duration": str(expiration)}
+            return jsonify(result=result)
+        return 401
+
+
 class ListAll(Resource):
-    def get(self, dtype='json', top=-1):
-        app.logger.debug("top: {}".format(top))
+    def get(self, dtype='json'):
+        token = request.args.get('token', default='nope')
+        if not verify_auth_token(SECRET_KEY, token):
+            return 401
         top = request.args.get('top', default=-1, type=int)
         app.logger.debug("top: {}".format(top))
         if dtype == 'csv':
@@ -69,8 +160,10 @@ class ListAll(Resource):
 
 
 class ListOpenOnly(Resource):
-    def get(self, dtype='json', top=-1):
-        app.logger.debug("top: {}".format(top))
+    def get(self, dtype='json'):
+        token = request.args.get('token', default='nope')
+        if not verify_auth_token(SECRET_KEY, token):
+            return 401
         top = request.args.get('top', default=-1, type=int)
         app.logger.debug("top: {}".format(top))
         if dtype == 'csv':
@@ -79,8 +172,10 @@ class ListOpenOnly(Resource):
 
 
 class ListCloseOnly(Resource):
-    def get(self, dtype='json', top=-1):
-        app.logger.debug("top: {}".format(top))
+    def get(self, dtype='json'):
+        token = request.args.get('token', default='nope')
+        if not verify_auth_token(SECRET_KEY, token):
+            return 401
         top = request.args.get('top', default=-1, type=int)
         app.logger.debug("top: {}".format(top))
         if dtype == 'csv':
@@ -90,6 +185,9 @@ class ListCloseOnly(Resource):
 
 # Create routes
 # Another way, without decorators
+api.add_resource(UserCheck, '/user_check')
+api.add_resource(RegisterUser, '/register')
+api.add_resource(TokenGeneration, '/token')
 api.add_resource(ListAll, '/listAll/<string:dtype>', '/listAll/')
 api.add_resource(ListOpenOnly, '/listOpenOnly/<string:dtype>', '/listOpenOnly/')
 api.add_resource(ListCloseOnly, '/listCloseOnly/<string:dtype>', '/listCloseOnly/')
