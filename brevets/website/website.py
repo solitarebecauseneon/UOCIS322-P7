@@ -185,7 +185,7 @@ def new_user():
             app.logger.debug("register/reg_success: {}".format(r.text))
             r_text = json.loads(r.text)
             app.logger.debug("register/reg_success: {}".format(r_text))
-            temp_user.set_id(r_text['id'])
+            temp_user.set_id(r_text['_id'])
             return redirect(url_for('login'))
 
     return render_template('register.html', form=form)
