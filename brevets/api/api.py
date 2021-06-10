@@ -62,7 +62,7 @@ def user_check(self):
             'username': '',
             'password': ''
         }
-    return jsonify(result), 200
+    return jsonify(result=result), 200
 
 
 def retrieve(val_include="default"):
@@ -122,7 +122,7 @@ def pull_password(self):
         result = {'password': user['password']}
     else:
         result = {'password': None}
-    return jsonify(result)
+    return jsonify(result=result), 200
 
 
 @app.route('/hidden')
@@ -151,7 +151,7 @@ def register():
     user_db.timestable.insert_one(user)
     app.logger.debug("registerUser/user: {}".format(user['_id']))
     app.logger.debug("registerUser/user: {}".format(user))
-    return jsonify(user), 201
+    return jsonify(result=user), 201
 
 
 @app.route('/token')
