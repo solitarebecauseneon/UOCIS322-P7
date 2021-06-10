@@ -205,6 +205,7 @@ class ListCloseOnly(Resource):
 # Another way, without decorators
 api.add_resource(UserCheck, '/user_check')
 api.add_resource(TokenGeneration, '/token')
+api.add_resource(PullPassword, '/pass_check')
 api.add_resource(ListAll, '/listAll/<string:dtype>', '/listAll/')
 api.add_resource(ListOpenOnly, '/listOpenOnly/<string:dtype>', '/listOpenOnly/')
 api.add_resource(ListCloseOnly, '/listCloseOnly/<string:dtype>', '/listCloseOnly/')
