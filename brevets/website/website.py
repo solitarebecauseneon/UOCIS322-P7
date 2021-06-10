@@ -46,7 +46,7 @@ class LoginForm(Form):
         validators.Length(min=2, max=25,
                           message=u"Invalid length for username - must be between 2 and 25 characters."),
         validators.InputRequired(u"Must put in a username!")])
-    password = StringField('Password', [
+    password = PasswordField('Password', [
         validators.Length(min=6, max=20,
                           message=u"Password must be between 6 and 20 characters"),
         validators.InputRequired(u"Must put in a password!")])

@@ -1,13 +1,10 @@
 # Streaming Service
 
-from flask import Flask, request, redirect, url_for, flash, jsonify
-import random
+from flask import Flask, request, jsonify
 from testToken import generate_auth_token, verify_auth_token
 import os
 from flask_restful import Resource, Api
 from pymongo import MongoClient
-
-import time
 
 # API set-up
 app = Flask(__name__)
@@ -24,10 +21,10 @@ user_db = client.userdb
 def retrieve_user(uid=-2, username=""):
     """Returns user data as a list; can use user id (uid) or username to retrieve"""
     if username != "":
-        return user_db.timestable.find_one(username=username)
+        return user_db.timestable.find_one({'username': username})
     if uid == -2:
         return user_db.timestable.find()
-    return user_db.timestable.find_one(id=int(uid))
+    return user_db.timestable.find_one({'_id': int(uid)})
 
 
 class UserCheck(Resource):
@@ -126,7 +123,7 @@ class RegisterUser(Resource):
             'hashword': hashword
         }
         user_db.timestable.insert_one(user)
-        user['uid'] = user_db.timestable.find(user['username'])['_id']
+        user['uid'] = user_db.timestable.find({'username': user['username']})['_id']
         return jsonify(user), 201
 
 
