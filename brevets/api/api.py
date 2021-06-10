@@ -123,6 +123,12 @@ class PullPassword(Resource):
         return jsonify(result)
 
 
+@app.route('/hidden')
+def delete():
+    user_db.timestable.delete_many({})
+    return 200
+
+
 @app.route('/register', methods=["POST"])
 def register():
     """

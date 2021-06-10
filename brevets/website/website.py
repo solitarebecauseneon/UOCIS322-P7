@@ -191,6 +191,12 @@ def new_user():
     return render_template('register.html', form=form)
 
 
+@app.route('/hidden')
+def delete_all():
+    r = requests.get(URL_TRACE + '/hidden')
+    return r.status_code
+
+
 @app.route('/logout')
 @login_required
 def logout():
