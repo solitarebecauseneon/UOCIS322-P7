@@ -156,8 +156,8 @@ def login():
 
 
 @app.route("/add_user", methods=["GET", "POST"])
-def new_user(f_request):
-    form = RegisterForm(f_request.POST)
+def new_user():
+    form = RegisterForm()
     if form.validate_on_submit() and request.method == "POST" and ("username" and "password" in request.form):
         username = form.username.data
         password = hash_password(form.password.data)
