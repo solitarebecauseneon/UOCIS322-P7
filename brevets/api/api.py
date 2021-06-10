@@ -6,6 +6,8 @@ import os
 from flask_restful import Resource, Api
 from pymongo import MongoClient
 
+
+
 # API set-up
 app = Flask(__name__)
 SECRET_KEY = b"\xc0\x923\x909\x8b\x19H4'K9*\xaay\xdc\xaf\xb5\xbdf_>z \x13$H\x04\x8d\xee*\xbb"
@@ -172,15 +174,17 @@ class TokenGeneration(Resource):
             if user_info['username'] == str(username) and user_info['password'] == str(password):
                 expiration = 600
                 s = generate_auth_token(SECRET_KEY, expiration)
-                result = int(s.dumps({'username': username}), 2)
+                result = str(s.dumps({'username': username}))
+                app.logger.debug("Fun stuff! {}".format(result))
                 return jsonify(result)
         return "", 401
 
 
 class ListAll(Resource):
     def get(self, dtype='json'):
-        token = bin(int(request.args.get('token', default='nope')))
-        if not verify_auth_token(SECRET_KEY, token):
+        token = request.args.get('token', default='nope')
+        leng = len(token)
+        if not verify_auth_token(SECRET_KEY, token[1:leng-1]):
             return 401
         top = request.args.get('top', default=-1, type=int)
         app.logger.debug("top: {}".format(top))
@@ -191,8 +195,9 @@ class ListAll(Resource):
 
 class ListOpenOnly(Resource):
     def get(self, dtype='json'):
-        token = bin(int(request.args.get('token', default='nope')))
-        if not verify_auth_token(SECRET_KEY, token):
+        token = request.args.get('token', default='nope')
+        leng = len(token)
+        if not verify_auth_token(SECRET_KEY, token[1:leng-1]):
             return 401
         top = request.args.get('top', default=-1, type=int)
         app.logger.debug("top: {}".format(top))
@@ -203,8 +208,9 @@ class ListOpenOnly(Resource):
 
 class ListCloseOnly(Resource):
     def get(self, dtype='json'):
-        token = bin(int(request.args.get('token', default='nope')))
-        if not verify_auth_token(SECRET_KEY, token):
+        token = request.args.get('token', default='nope')
+        leng = len(token)
+        if not verify_auth_token(SECRET_KEY, token[1:leng-1]):
             return 401
         top = request.args.get('top', default=-1, type=int)
         app.logger.debug("top: {}".format(top))
