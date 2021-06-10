@@ -78,10 +78,10 @@ def is_safe_url(target):
 
 
 class User(UserMixin):
-    def __init__(self, uid, username, hashword):
+    def __init__(self, uid, username, password):
         self.id = uid
         self.username = username
-        self.hashword = hashword
+        self.password = password
         self.token = 'nope'
 
     def set_id(self, uid):
@@ -94,7 +94,7 @@ class User(UserMixin):
         new_dict = {
             'uid': self.id,
             'username': self.username,
-            'password': self.hashword,
+            'password': self.password,
             'token': self.token
         }
         return new_dict
