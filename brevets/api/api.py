@@ -38,10 +38,8 @@ class UserCheck(Resource):
     password: returns value only if needed for User object
 
     """
-    def get(self):
+    def get(self, uid=-1, username='-1'):
         # variables
-        uid = request.args.get('uid', default=-1)
-        username = request.args.get('username', default='-1')
         # checking for user in user_db
         if uid == -1:  # if no uid given
             app.logger.debug("usercheck/username: {}".format(username))
@@ -113,8 +111,7 @@ class PullPassword(Resource):
     """
     Retrieves hashed password for specified username
     """
-    def get(self):
-        username = request.args.get('username')
+    def get(self, username):
         user = retrieve_user(username)
         if user:
             result = {'password': user['password']}
@@ -152,12 +149,11 @@ class TokenGeneration(Resource):
     Checks if username and hashword (hashed password) exists in
     database. If so, generates and returns a token. Else, returns abort request
     """
-    def get(self):
-        username = request.args.get('username')
-        hashword = request.args.get('password')
+    def get(self, username, password):
+
         user_info = retrieve_user(username=username)
         if user_info:
-            if user_info['username'] == username and user_info['hashword'] == hashword:
+            if user_info['username'] == username and user_info['password'] == password:
                 expiration = 600
                 s = generate_auth_token(SECRET_KEY, expiration)
                 result = {"token": s, "duration": str(expiration)}
