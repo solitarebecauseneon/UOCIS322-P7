@@ -64,9 +64,9 @@ class UserCheck(Resource):
                 'password': ''
             }
             return jsonify(result)
-        if password == '-1':
+        if str(password) == '-1':
             return jsonify(result)
-        if result['password'] == password:
+        if result['password'] == str(password):
             return jsonify(result)
         else:
             result = {
