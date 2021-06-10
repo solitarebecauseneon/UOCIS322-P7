@@ -151,6 +151,8 @@ def login():
         if r_text['login'] == 'fail':  # no matching username found in database
             flash("Invalid username or password!")
             proceed = False
+        r = requests.get(URL_TRACE + '/user_check', params=temp_user.db_dict())
+        r_text = json.loads(r.text)
         temp_user.set_id(r_text['uid'])
         # Login user, if nothing went wrong finding user info in database
         if proceed:
