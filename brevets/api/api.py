@@ -207,7 +207,7 @@ class ListOpenOnly(Resource):
 
 class ListCloseOnly(Resource):
     def get(self, dtype='json'):
-        token = bytes(request.args.get('token', default='nope').encode('utf-8'))
+        token = request.args.get('token', default='nope')
         app.logger.debug(token)
         if not verify_auth_token(SECRET_KEY, token):
             return 401
