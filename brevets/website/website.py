@@ -124,7 +124,8 @@ def home():
 @app.route('/get_token')
 def get_token():
     if current_user.is_authenticated:
-        r = requests.get(URL_TRACE + '/token')
+        s = current_user.db_dict()
+        r = requests.get(URL_TRACE + '/token', params=s)
         app.logger.debug("/get_token/token: {}".format(r.text))
         if r.status_code == 401:
             abort(401)
@@ -156,8 +157,7 @@ def login():
             if login_user(temp_user, remember=remember):
                 flash("Logged in!")
                 flash("I'll remember you") if remember else None
-                return redirect(url_for('get_token'))
-
+                return redirect(next or url_for('index'))
     return render_template('login.html', form=form)
 
 

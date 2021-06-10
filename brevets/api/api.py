@@ -57,6 +57,13 @@ class UserCheck(Resource):
                 'username': user_entry['username'],
                 'password': user_entry['password']
             }
+            if int(uid) == -1 and result['username'] == str(username):
+                result = {
+                    'uid': -1,
+                    'username': '',
+                    'password': ''
+                }
+                return jsonify(result)
         else:  # no entry found; return uid as -1, other values as blanks
             result = {
                 'uid': -1,
