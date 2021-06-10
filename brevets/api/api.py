@@ -181,7 +181,7 @@ class TokenGeneration(Resource):
 
 class ListAll(Resource):
     def get(self, dtype='json'):
-        token = bytes(request.args.get('token', default='nope'))
+        token = bytes(request.args.get('token', default='nope').encoding('utf-8'))
         app.logger.debug(token)
         if not verify_auth_token(SECRET_KEY, token):
             return 401
@@ -194,7 +194,7 @@ class ListAll(Resource):
 
 class ListOpenOnly(Resource):
     def get(self, dtype='json'):
-        token = bytes(request.args.get('token', default='nope'))
+        token = bytes(request.args.get('token', default='nope').encoding('utf-8'))
         app.logger.debug(token)
         if not verify_auth_token(SECRET_KEY, token):
             return 401
@@ -207,7 +207,7 @@ class ListOpenOnly(Resource):
 
 class ListCloseOnly(Resource):
     def get(self, dtype='json'):
-        token = bytes(request.args.get('token', default='nope'))
+        token = bytes(request.args.get('token', default='nope').encoding('utf-8'))
         app.logger.debug(token)
         if not verify_auth_token(SECRET_KEY, token):
             return 401
