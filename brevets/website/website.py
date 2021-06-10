@@ -1,5 +1,5 @@
 from flask import Flask, request, render_template, redirect, url_for, flash, abort
-from password import hash_password
+from passlib.hash import sha256_crypt as pwd_context
 from urllib.parse import urlparse, urljoin
 from flask_login import (LoginManager, current_user, login_required,
                          login_user, logout_user, UserMixin,
@@ -125,7 +125,7 @@ def login():
     # Collect form data
     if form.validate_on_submit() and request.method == "POST" and ("username" and "password" in request.form):
         username = form.username.data
-        password = hash_password(form.password.data)
+        password = pwd_context.using(salt="abedfghdsfasf").encrypt(form.password.data)
         temp_user = User(-1, username, password)
         remember = request.form.get("remember", "false") == "true"
 
@@ -166,9 +166,7 @@ def new_user():
     form = RegisterForm()
     if form.validate_on_submit() and request.method == "POST" and ("username" and "password" in request.form):
         username = form.username.data
-        password = form.password.data
-        app.logger.debug("register/password: {}".format(password))
-        password = hash_password(password)
+        password = pwd_context.using(salt="abedfghdsfasf").encrypt(form.password.data)
         app.logger.debug("register/hash_password: {}".format(password))
         temp_user = User(-1, username, password)
         # check if username already exists
