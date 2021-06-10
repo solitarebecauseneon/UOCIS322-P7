@@ -164,7 +164,7 @@ def login():
     return render_template('login.html', form=form)
 
 
-@app.route("/add_user", methods=["GET", "POST"])
+@app.route("/add_user", methods=["POST"])
 def new_user():
     form = RegisterForm()
     if form.validate_on_submit() and request.method == "POST" and ("username" and "password" in request.form):
