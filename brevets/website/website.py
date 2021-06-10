@@ -120,8 +120,6 @@ def index():
 @app.route('/calc_index.html')
 @login_required
 def home():
-    if current_user.is_authenticated and current_user.db_dict()['token'] == 'nope':
-        return redirect(url_for('get_token'))
     return render_template('calc_index.html')
 
 
@@ -141,13 +139,6 @@ def get_token():
             USERS[str(uid)] = current_user
         app.logger.debug("current_user: {}".format(current_user))
     return redirect(url_for('index'))
-
-
-@app.route('/_check')
-def check():
-    s = current_user.db_dict()
-    app.logger.debug(s)
-    return s
 
 
 @app.route("/login", methods=["GET", "POST"])
