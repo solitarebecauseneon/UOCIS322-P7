@@ -114,9 +114,8 @@ def page_not_found(error):
 @app.route('/')
 @app.route('/index')
 def index():
-    if current_user.is_authenticated:
-        if current_user.db_dict()['token'] == 'none':
-            return redirect(url_for('get_token'))
+    if current_user.is_authenticated and current_user.db_dict()['token'] == 'none':
+        return redirect(url_for('get_token'))
     return render_template('index.html')
 
 
@@ -130,11 +129,16 @@ def home():
 def get_token():
     if current_user.is_authenticated:
         s = current_user.db_dict()
+        uid = s['uid']
         r = requests.get(URL_TRACE + '/token', params=s)
         app.logger.debug("/get_token/token: {}".format(r.text))
         if r.status_code == 401:
             abort(401)
         current_user.set_token(r.text)
+        if str(uid) in USERS.keys():
+            USERS[str(uid)] = current_user
+        else:
+            USERS[str(uid)] = current_user
     return redirect(url_for('index'))
 
 
