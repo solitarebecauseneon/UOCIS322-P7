@@ -29,7 +29,7 @@ def retrieve_user(uid=-2, username=""):
 
 class UserCheck(Resource):
     """
-    returns a tuple, (uid:int, username:str, password:str)
+    returns a JSON object, {uid:int, username:str, password:str}
 
     uid: returns '_id' element from user_db; if -1 on exit,
     no entry matching uid or username was found in user_db
@@ -53,13 +53,29 @@ class UserCheck(Resource):
             user_entry = retrieve_user(uid)  # uid given: retrieve entry using uid
         if user_entry:  # if an entry is found
             if password == '-1':  # if password is default, return all for User class creation
-                result = (user_entry['_id'], user_entry['username'], user_entry['password'])
+                result = {
+                    'uid': user_entry['_id'],
+                    'username': user_entry['username'],
+                    'password': user_entry['password']
+                }
             elif user_entry['password'] == password:  # password is not default; check if password match db password
-                result = (user_entry['_id'], user_entry['username'], '0')
+                result = {
+                    'uid': user_entry['_id'],
+                    'username': user_entry['username'],
+                    'password': '0'
+                }
             else:  # password does NOT match database entry
-                result = (user_entry['_id'], user_entry['username'], '-1')
+                result = {
+                    'uid': user_entry['_id'],
+                    'username': user_entry['username'],
+                    'password': '-1'
+                }
         else:  # no entry found; return uid as -1, other values as blanks
-            result = (-1, '', '')
+            result = {
+                'uid': -1,
+                'username': '',
+                'password': ''
+            }
         return jsonify(result)
 
 
@@ -115,12 +131,12 @@ class RegisterUser(Resource):
     """
     def get(self):
         username = request.args.get('username')
-        hashword = request.args.get('password')
+        password = request.args.get('password')
         if retrieve_user(username)['username'] != username:
             return 400
         user = {
             'username': username,
-            'hashword': hashword
+            'password': password
         }
         user_db.timestable.insert_one(user)
         user['uid'] = user_db.timestable.find({'username': user['username']})['_id']
@@ -136,11 +152,12 @@ class TokenGeneration(Resource):
         username = request.args.get('username')
         hashword = request.args.get('password')
         user_info = retrieve_user(username=username)
-        if user_info['username'] == username and user_info['hashword'] == hashword:
-            expiration = 600
-            s = generate_auth_token(SECRET_KEY, expiration)
-            result = {"token": s, "duration": str(expiration)}
-            return jsonify(result=result)
+        if user_info:
+            if user_info['username'] == username and user_info['hashword'] == hashword:
+                expiration = 600
+                s = generate_auth_token(SECRET_KEY, expiration)
+                result = {"token": s, "duration": str(expiration)}
+                return jsonify(result=result)
         return 401
 
 

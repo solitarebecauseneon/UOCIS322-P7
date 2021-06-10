@@ -8,6 +8,7 @@ from flask_wtf import FlaskForm as Form
 from wtforms import BooleanField, StringField, PasswordField, validators
 import requests
 import os
+import json
 
 app = Flask(__name__)
 
@@ -130,13 +131,14 @@ def login():
 
         # Check if user exists in database and if password is correct
         r = requests.get(URL_TRACE + '/user_check', params=temp_user.db_dict())
-        if r.text[0] == -1:  # no matching username found in database
+        r_text = json.loads(r.text)
+        if r_text['uid'] == -1:  # no matching username found in database
             flash("Username does not exist!")
             proceed = False
-        elif r.text[2] == '-1':  # password failed!
+        elif r_text['password'] == '-1':  # password failed!
             flash("Invalid password!")
             proceed = False
-        elif r.text[2] == '0':  # update temp_user.id with database id; proceed to login
+        elif r_text['password'] == '0':  # update temp_user.id with database id; proceed to login
             temp_user.set_id(r.text[0])
         # Login user, if nothing went wrong finding user info in database
         if login_user(temp_user, remember=remember) and proceed:
@@ -145,7 +147,8 @@ def login():
             r = requests.get(URL_TRACE + '/token', params=temp_user.db_dict())
             if r.status_code == 401:
                 return render_template('login_html', form=form)
-            temp_user.set_token(r.text[3])
+            r_text = json.loads(r.text)
+            temp_user.set_token(r_text['token'])
             next_page = request.args.get("next")
             if not is_safe_url(next_page):
                 abort(400)
@@ -163,9 +166,10 @@ def new_user():
         temp_user = User(-1, username, password)
         # check if username already exists
         r = requests.get(URL_TRACE + '/user_check', params=temp_user.db_dict())
-        app.logger.debug("register/username_check: {}".format(r.text))
-        app.logger.debug("register/username_check: {}".format(r.text[0]))
-        if r.text[0] != -1:  # username already exists!
+        r_text = json.loads(r.text)
+        app.logger.debug("register/username_check: {}".format(r_text))
+        app.logger.debug("register/username_check: {}".format(r_text['uid']))
+        if r_text['uid'] != -1:  # username already exists!
             flash("Username taken! Try again.")
             return render_template('register.html', form=form)
         else:  # if username does not already exist
@@ -173,7 +177,7 @@ def new_user():
             if r.status_code == 401:
                 render_template('register.html', form=form)
             app.logger.debug("register/reg_success: {}".format(r.text))
-            temp_user.set_id(r.text[0])
+            temp_user.set_id(r_text['uid'])
             return redirect(url_for('login'))
 
     return render_template('register.html', form=form)
