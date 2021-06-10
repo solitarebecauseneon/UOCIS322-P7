@@ -30,14 +30,20 @@ login_manager.needs_refresh_message_category = "info"
 
 URL_TRACE = "http://" + os.environ['BACKEND_ADDR'] + ":" + os.environ['BACKEND_PORT']
 
+USERS = {}
+
 
 @login_manager.user_loader
 def load_user(uid):
-    r = requests.get(URL_TRACE + '/user_check', params={'uid': int(uid)})
-    app.logger.debug(r.text)
-    r_text = json.loads(r.text)
-    app.logger.debug(r_text)
-    temp = User(r_text['uid'], r_text['username'], r_text['password'])
+    if str(uid) in USERS.keys():
+        return USERS[str(uid)]
+    else:
+        r = requests.get(URL_TRACE + '/user_check', params={'uid': int(uid)})
+        app.logger.debug(r.text)
+        r_text = json.loads(r.text)
+        app.logger.debug(r_text)
+        temp = User(r_text['uid'], r_text['username'], r_text['password'])
+        USERS[str(uid)] = temp
     return temp
 
 
