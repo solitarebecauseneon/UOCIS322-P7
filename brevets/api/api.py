@@ -158,15 +158,16 @@ class TokenGeneration(Resource):
     """
     def get(self):
         username = request.args.get('username')
-        hashword = request.args.get('password')
+        password = request.args.get('password')
         user_info = retrieve_user(username=username)
         if user_info:
-            if user_info['username'] == username and user_info['hashword'] == hashword:
+            app.logger.debug("/TokenGeneration/userinfo: {}".format(user_info))
+            if user_info['username'] == username and user_info['password'] == password:
                 expiration = 600
                 s = generate_auth_token(SECRET_KEY, expiration)
                 result = {"token": s, "duration": str(expiration)}
                 return jsonify(result=result)
-        return 401
+        return "", 401
 
 
 class ListAll(Resource):
