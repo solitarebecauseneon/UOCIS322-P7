@@ -123,6 +123,7 @@ def home():
 def get_token():
     if current_user.is_authenticated:
         r = requests.get(URL_TRACE + '/token')
+        app.logger.debug("/get_token/token: {}".format(r.text))
         if r.status_code == 401:
             abort(401)
         r_text = json.loads(r.text)
