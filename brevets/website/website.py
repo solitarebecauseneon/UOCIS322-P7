@@ -82,7 +82,7 @@ class User(UserMixin):
         self.id = uid
         self.username = username
         self.hashword = hashword
-        self.token = ''
+        self.token = 'nope'
 
     def set_id(self, uid):
         self.id = uid
