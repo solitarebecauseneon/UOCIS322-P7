@@ -140,7 +140,7 @@ class RegisterUser(Resource):
             'password': password
         }
         user_db.timestable.insert_one(user)
-        temp = user_db.timestable.find({'username': user['username']})
+        temp = user_db.timestable.find_one({'username': user['username']})
         user['uid'] = temp['_id']
         app.logger.debug("registerUser/user: {}".format(user['uid']))
         app.logger.debug("registerUser/user: {}".format(user))
