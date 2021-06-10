@@ -137,6 +137,9 @@ def login():
             proceed = False
         temp_user.set_id(r_text['uid'])
         r = requests.get(URL_TRACE + '/pass_check', params=temp_user.db_dict())
+        if r.status_code == 400:
+            flash("Incorrect password!")
+            return render_template('login.html', form=form)
         r_text = json.loads(r.text)
         app.logger.debug("login/passcheck: {}".format(r_text['password']))
         app.logger.debug("login/password: {}".format(password))

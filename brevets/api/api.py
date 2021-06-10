@@ -120,7 +120,7 @@ class PullPassword(Resource):
         if user:
             result = {'password': user['password']}
         else:
-            return 400
+            return "", 400
         return jsonify(result)
 
 
