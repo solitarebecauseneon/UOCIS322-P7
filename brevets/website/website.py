@@ -112,7 +112,7 @@ def fill_up():
     r_text = json.loads(r.text)
     for i in r_text.keys():
         USERS[str(i)] = r_text[i]
-    return render_template(url_for('index'))
+    return render_template(url_for('get_token'))
 
 
 @app.route('/')
@@ -169,7 +169,7 @@ def login():
             if login_user(temp_user, remember=remember):
                 flash("Logged in!")
                 flash("I'll remember you") if remember else None
-                next = url_for('get_token')
+                next = url_for('/fill_users')
                 if not is_safe_url(next):
                     abort(400)
                 return redirect(next or url_for('index'))
