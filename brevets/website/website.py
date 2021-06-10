@@ -35,7 +35,16 @@ USERS = {}
 
 @login_manager.user_loader
 def load_user(uid):
-    return USERS[str(uid)]
+    if str(uid) not in USERS.keys():
+        r = requests.get(URL_TRACE + '/user_check', params={'uid': int(uid)})
+        app.logger.debug(r.text)
+        r_text = json.loads(r.text)
+        app.logger.debug(r_text)
+        temp = User(r_text['uid'], r_text['username'], r_text['password'])
+        USERS[str(uid)] = temp
+        return USERS[str(uid)]
+    else:
+        return USERS[str(uid)]
 
 
 login_manager.init_app(app)
@@ -106,15 +115,6 @@ def page_not_found(error):
     return render_template('404.html'), 404
 
 
-@app.route('/fill_users')
-def fill_up():
-    r = requests.get(URL_TRACE + '/list_all_users')
-    r_text = json.loads(r.text)
-    for i in r_text.keys():
-        USERS[str(i)] = r_text[i]
-    return render_template(url_for('index'))
-
-
 @app.route('/')
 @app.route('/index')
 def index():
@@ -130,18 +130,13 @@ def home():
 @app.route('/get_token')
 def get_token():
     s = current_user.db_dict()
-    uid = s['uid']
     r = requests.get(URL_TRACE + '/token', params=s)
     app.logger.debug("/get_token/token: {}".format(r.text))
     if r.status_code == 401:
         abort(401)
     current_user.set_token(r.text)
-    if str(uid) in USERS.keys():
-        USERS[str(uid)] = current_user
-    else:
-        USERS[str(uid)] = current_user
     app.logger.debug("current_user: {}".format(current_user))
-    return redirect(url_for('index'))
+    return render_template('index.html')
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -169,7 +164,7 @@ def login():
             if login_user(temp_user, remember=remember):
                 flash("Logged in!")
                 flash("I'll remember you") if remember else None
-                next = url_for('fill_up')
+                next = url_for('get_token')
                 if not is_safe_url(next):
                     abort(400)
                 return redirect(next or url_for('index'))
@@ -197,7 +192,7 @@ def new_user():
             app.logger.debug("register/reg_success: {}".format(r.text))
             r_text = json.loads(r.text)
             app.logger.debug("register/reg_success: {}".format(r_text))
-            return redirect(url_for('fill_up'))
+            return redirect(url_for('login'))
 
     return render_template('register.html', form=form)
 
