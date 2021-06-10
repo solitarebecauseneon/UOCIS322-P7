@@ -34,8 +34,7 @@ URL_TRACE = "http://" + os.environ['BACKEND_ADDR'] + ":" + os.environ['BACKEND_P
 def load_user(uid):
     r = requests.get(URL_TRACE + '/user_check', params={'uid': uid})
     r = r.text
-    temp_user = User(r[0], r[1], r[2])
-    return temp_user
+    return r[0]
 
 
 login_manager.init_app(app)
@@ -79,20 +78,20 @@ def is_safe_url(target):
 
 class User(UserMixin):
     def __init__(self, uid, username, hashword):
-        self.uid = uid
+        self.id = uid
         self.username = username
         self.hashword = hashword
         self.token = ''
 
     def set_id(self, uid):
-        self.uid = uid
+        self.id = uid
 
     def set_token(self, token):
         self.token = token
 
     def db_dict(self):
         new_dict = {
-            'uid': self.uid,
+            'uid': self.id,
             'username': self.username,
             'password': self.hashword,
             'token': self.token
@@ -165,10 +164,10 @@ def new_user():
         # check if username already exists
         r = requests.get(URL_TRACE + '/user_check', params=temp_user.db_dict())
         app.logger.debug("register/username_check: {}".format(r.text))
+        app.logger.debug("register/username_check: {}".format(r.text[0]))
         if r.text[0] != -1:  # username already exists!
             flash("Username taken! Try again.")
             return render_template('register.html', form=form)
-
         else:  # if username does not already exist
             r = requests.get(URL_TRACE + '/register', params=temp_user.db_dict())
             if r.status_code == 401:
