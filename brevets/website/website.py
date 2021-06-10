@@ -118,6 +118,16 @@ def home():
     return render_template('calc_index.html')
 
 
+@app.route('/get_token')
+def get_token():
+    r = requests.get(URL_TRACE + '/token', params=current_user.db_dict())
+    if r.status_code == 401:
+        abort(401)
+    r_text = json.loads(r.text)
+    current_user.set_token(r_text['token'])
+    return redirect(url_for('index'))
+
+
 @app.route("/login", methods=["GET", "POST"])
 def login():
     form = LoginForm()
@@ -141,15 +151,7 @@ def login():
             if login_user(temp_user, remember=remember):
                 flash("Logged in!")
                 flash("I'll remember you") if remember else None
-                r = requests.get(URL_TRACE + '/token', params=temp_user.db_dict())
-                if r.status_code == 401:
-                    return render_template('login_html', form=form)
-                r_text = json.loads(r.text)
-                temp_user.set_token(r_text['token'])
-                next_page = request.args.get("next")
-                if not is_safe_url(next_page):
-                    abort(400)
-                return redirect(next_page or url_for('index'))
+                return redirect(url_for('get_token'))
 
     return render_template('login.html', form=form)
 
