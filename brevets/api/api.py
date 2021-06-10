@@ -48,8 +48,10 @@ class UserCheck(Resource):
 
         # checking for user in user_db
         if uid == -1:  # if no uid given
+            app.logger.debug("usercheck/username: {}".format(username))
             user_entry = retrieve_user(username=username)  # retrieve entry using username
         else:
+            app.logger.debug("usercheck/uid: {}".format(uid))
             user_entry = retrieve_user(uid)  # uid given: retrieve entry using uid
         if user_entry:  # if an entry is found
             if password == '-1':  # if password is default, return all for User class creation
@@ -132,14 +134,15 @@ class RegisterUser(Resource):
     def get(self):
         username = request.args.get('username')
         password = request.args.get('password')
-        if retrieve_user(username)['username'] != username:
+        if retrieve_user(username=username)['username'] != username:
             return 400
         user = {
             'username': username,
             'password': password
         }
         user_db.timestable.insert_one(user)
-        user['uid'] = user_db.timestable.find({'username': user['username']})['_id']
+        temp = user_db.timestable.find({'username': user['username']})
+        user['uid'] = temp['_id']
         return jsonify(user), 201
 
 

@@ -175,8 +175,8 @@ def new_user():
         else:  # if username does not already exist
             r = requests.get(URL_TRACE + '/register', params=temp_user.db_dict())
             if r.status_code == 401:
-                render_template('register.html', form=form)
-            app.logger.debug("register/reg_success: {}".format(r.text))
+                return render_template('register.html', form=form)
+            app.logger.debug("register/reg_success: {}".format(r_text))
             temp_user.set_id(r_text['uid'])
             return redirect(url_for('login'))
 
