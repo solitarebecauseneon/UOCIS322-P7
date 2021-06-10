@@ -115,7 +115,7 @@ class PullPassword(Resource):
     """
     def get(self):
         username = request.args.get('username')
-        user = retrieve_user(username)
+        user = retrieve_user(username=username)
         if user:
             result = {'password': user['password']}
         else:

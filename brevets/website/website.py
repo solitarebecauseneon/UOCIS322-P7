@@ -167,8 +167,6 @@ def new_user():
     if form.validate_on_submit() and request.method == "POST" and ("username" and "password" in request.form):
         username = form.username.data
         password = hash_password(form.password.data)
-        app.logger.debug("register/username: {}".format(username))
-        app.logger.debug("register/password: {}".format(password))
         temp_user = User(-1, username, password)
         # check if username already exists
         r = requests.get(URL_TRACE + '/user_check', params=temp_user.db_dict())
