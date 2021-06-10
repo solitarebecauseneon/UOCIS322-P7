@@ -24,10 +24,10 @@ user_db = client.userdb
 def retrieve_user(uid=-2, username=""):
     """Returns user data as a list; can use user id (uid) or username to retrieve"""
     if username != "":
-        return user_db.timestable.findOne(username=username)
+        return user_db.timestable.find_one(username=username)
     if uid == -2:
         return user_db.timestable.find()
-    return user_db.timestable.findOne(id=int(uid))
+    return user_db.timestable.find_one(id=int(uid))
 
 
 class UserCheck(Resource):
