@@ -28,7 +28,7 @@ def retrieve_user(uid=-2, username=""):
 
 
 @app.route('/user_check')
-def user_check(self):
+def user_check():
     """
     returns a JSON object, {uid:int, username:str, password:str}
 
@@ -111,7 +111,7 @@ def json_form(result, top):
 
 
 @app.route('/pass_check')
-def pull_password(self):
+def pull_password():
     """
     Retrieves hashed password for specified username
     """
@@ -155,7 +155,7 @@ def register():
 
 
 @app.route('/token')
-def token_generation(self):
+def token_generation():
     """
     Checks if username and hashword (hashed password) exists in
     database. If so, generates and returns a token. Else, returns abort request
