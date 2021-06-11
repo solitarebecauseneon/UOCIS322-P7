@@ -134,8 +134,9 @@ def get_token():
     app.logger.debug("/get_token/token: {}".format(r.text))
     if r.status_code == 401:
         abort(401)
-    current_user.set_token(r.text)
-    app.logger.debug("current_user: {}".format(current_user))
+    r_text = json.loads(r.text)
+    current_user.set_token(r_text)
+    app.logger.debug("current_user: {}".format(current_user.db_dict()))
     return render_template('index.html')
 
 
