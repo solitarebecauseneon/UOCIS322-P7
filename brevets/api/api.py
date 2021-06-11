@@ -1,7 +1,9 @@
 # Streaming Service
 
 from flask import Flask, request, jsonify
-from testToken import generate_auth_token, verify_auth_token
+from itsdangerous import (TimedJSONWebSignatureSerializer
+                          as Serializer, BadSignature,
+                          SignatureExpired)
 import os
 from flask_restful import Resource, Api
 from pymongo import MongoClient
@@ -17,6 +19,24 @@ api = Api(app)
 client = MongoClient('mongodb://' + os.environ['MONGODB_HOSTNAME'], 27017)
 db = client.brevetdb
 user_db = client.userdb
+
+
+def generate_auth_token(key, expiration=600):
+    s = Serializer(key, expires_in=expiration)
+    return s
+
+
+def verify_auth_token(key, token):
+    s = Serializer(key)
+    try:
+        app.logger.debug(s)
+        app.logger.debug(s.loads(token))
+        data = s.loads(token)
+    except SignatureExpired:
+        return False    # valid token, but expired
+    except BadSignature:
+        return False    # invalid token
+    return True
 
 
 def retrieve_user(uid=-2, username=""):
@@ -181,7 +201,7 @@ class TokenGeneration(Resource):
 
 class ListAll(Resource):
     def get(self, dtype='json'):
-        token = bytes(request.args.get('token', default='nope').encode('utf-8')).decode('utf-8')
+        token = request.args.get('token', default='nope').encode('utf-8')
         app.logger.debug(token)
         if not verify_auth_token(SECRET_KEY, token):
             return 401
@@ -194,7 +214,7 @@ class ListAll(Resource):
 
 class ListOpenOnly(Resource):
     def get(self, dtype='json'):
-        token = bytes(request.args.get('token', default='nope').encode('utf-8')).decode('utf-8')
+        token = bytes(request.args.get('token', default='nope').encode('utf-8'))
         app.logger.debug(token)
         if not verify_auth_token(SECRET_KEY, token):
             return 401
@@ -207,7 +227,7 @@ class ListOpenOnly(Resource):
 
 class ListCloseOnly(Resource):
     def get(self, dtype='json'):
-        token = bytes(request.args.get('token', default='nope').encode('utf-8'))
+        token = bytes(str(bytes(request.args.get('token', default='nope').encode('utf-8'))))
         app.logger.debug(token)
         if not verify_auth_token(SECRET_KEY, token):
             return 401
